@@ -6,11 +6,11 @@ import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
-public class AStreamSequenceMapper implements AStreamMapper {
+public class SequenceMapper implements AStreamMapper {
     private var classInfo:ClassInfo;
     private var registry:AStreamRegistry;
 
-    public function AStreamSequenceMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function SequenceMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
         this.classInfo = classInfo;
         this.registry = registry;
     }
@@ -51,7 +51,7 @@ public class AStreamSequenceMapper implements AStreamMapper {
         TypeUtil.forEachInCollection(sequence,
                 function (itemValue:Object, i:int, collection:Object):void {
                     var itemValueType:ClassInfo;
-                    if (itemValue != null && !isNaN(itemValue as Number)) {
+                    if (itemValue != null) {
                         itemValueType = ClassInfo.forInstance(itemValue);
                     }
                     var itemValueMapper:AStreamMapper = registry.getMapperForClass(itemValueType);

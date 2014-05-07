@@ -1,10 +1,10 @@
 package ru.kokorin.astream.ref {
 import org.spicefactory.lib.collection.Map;
 
-public class AStreamBaseDeref implements AStreamDeref {
-    const refMap:Map = new Map();
+public class BaseDeref implements AStreamDeref {
+    private const refMap:Map = new Map();
 
-    public function AStreamBaseDeref() {
+    public function BaseDeref() {
     }
 
     public function addRef(value:Object, xml:XML):void {

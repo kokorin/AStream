@@ -2,7 +2,7 @@ package ru.kokorin.astream.mapper {
 import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
 
-public class AStreamNullMapper implements AStreamMapper {
+public class NullMapper implements AStreamMapper {
     public function toXML(instance:Object, ref:AStreamRef):XML {
         return XML("<null/>");
     }

@@ -8,16 +8,17 @@ import org.flexunit.asserts.assertNotNull;
 
 import org.spicefactory.lib.reflect.ClassInfo;
 
+import ru.kokorin.astream.AStream;
+
 import ru.kokorin.astream.AStreamRegistry;
 
-public class AStreamByteArrayMapperTest {
-    private var registry:AStreamRegistry;
-    private var byteArrayMapper:AStreamByteArrayMapper;
+public class ByteArrayMapperTest {
+    private var byteArrayMapper:ByteArrayMapper;
 
     [Before]
     public function setUp():void {
-        registry = new AStreamRegistry();
-        byteArrayMapper = new AStreamByteArrayMapper(ClassInfo.forClass(ByteArray), registry);
+        const registry:AStreamRegistry = new AStreamRegistry();
+        byteArrayMapper = new ByteArrayMapper(ClassInfo.forClass(ByteArray), registry);
     }
 
     private static const TEXT:String = "The quick brown fox jumps over the lazy dog";

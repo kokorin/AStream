@@ -7,14 +7,14 @@ import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
-public class AStreamComplexMapper implements AStreamMapper{
+public class ComplexMapper implements AStreamMapper{
     private var classInfo:ClassInfo;
     private var registry:AStreamRegistry;
     private var processed:Boolean = false;
     private const handlers:Array = new Array();
 
 
-    public function AStreamComplexMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function ComplexMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
         this.classInfo = classInfo;
         this.registry = registry;
     }
@@ -38,6 +38,7 @@ public class AStreamComplexMapper implements AStreamMapper{
             if (asAttribute && TypeUtil.isSimple(property.type)) {
                 propertyHandler = new AttributeHandler(property, propertyAlias);
             } else if (asImplicitCollection && TypeUtil.isCollection(property.type)) {
+                //TODO для вложенного списка необходимо задать itemName и itemType
                 var itemName:String = registry.getImplicitItemName(classInfo, property.name);
                 //TODO получить тип элемента через TypeUtil.getItemType
                 var itemType:ClassInfo = registry.getImplicitItemType(classInfo, property.name);
@@ -109,7 +110,7 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 interface PropertyHandler {
-    function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef);
+    function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void;
     function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamDeref):void;
 }
 
@@ -123,9 +124,9 @@ class AttributeHandler implements PropertyHandler {
         this.name = name;
     }
 
-    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef) {
+    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        if (value != null && !isNaN(value as Number)) {
+        if (value != null) {
             parentXML.attribute(name)[0] = String(value);
         }
     }
@@ -135,9 +136,8 @@ class AttributeHandler implements PropertyHandler {
         var value:Object = null;
         if (attValue != null) {
             value = String(attValue);
-        } else if (property.type.isType(Number)) {
-            value = NaN;
         }
+        //setValue implicitly calls appropriate converter
         property.setValue(parentInstance, value);
     }
 }
@@ -153,9 +153,9 @@ class ChildElementHandler implements PropertyHandler {
         this.registry = registry;
     }
 
-    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef) {
+    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        if (value != null && !isNaN(value as Number)) {
+        if (value != null) {
             const result:XML = <{name}/>;
             parentXML.appendChild(result);
 
@@ -183,8 +183,6 @@ class ChildElementHandler implements PropertyHandler {
                 valueMapper = registry.getMapperForClass(property.type);
             }
             value = valueMapper.fromXML(elementValue, deref);
-        } else if (property.type.isType(Number)) {
-            value = NaN;
         }
         property.setValue(parentInstance, value);
     }
@@ -203,7 +201,7 @@ class ImplicitCollectionHandler implements PropertyHandler {
         this.registry = registry;
     }
 
-    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef) {
+    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
         const itemMapper:AStreamMapper = registry.getMapperForClass(itemType);
         TypeUtil.forEachInCollection(value,

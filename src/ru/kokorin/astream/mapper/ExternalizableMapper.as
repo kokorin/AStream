@@ -5,9 +5,9 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 
-public class AStreamExternalizableMapper extends AStreamSequenceMapper {
+public class ExternalizableMapper extends SequenceMapper {
 
-    public function AStreamExternalizableMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function ExternalizableMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
         super(classInfo, registry);
     }
 
@@ -30,7 +30,6 @@ import flash.utils.ByteArray;
 import flash.utils.IDataInput;
 import flash.utils.IDataOutput;
 
-//TODO what to do with writeUTFBytes() and readUTFBytes?
 class ArrayInput implements IDataInput {
     private var data:Array;
 
@@ -39,6 +38,7 @@ class ArrayInput implements IDataInput {
     }
 
     public function readBytes(bytes:ByteArray, offset:uint = 0, length:uint = 0):void {
+        throw new Error("Unsupported operation");
     }
 
     public function readBoolean():Boolean {
@@ -78,7 +78,7 @@ class ArrayInput implements IDataInput {
     }
 
     public function readMultiByte(length:uint, charSet:String):String {
-        return "";
+        throw new Error("Unsupported operation");
     }
 
     public function readUTF():String {
@@ -86,11 +86,11 @@ class ArrayInput implements IDataInput {
     }
 
     public function readUTFBytes(length:uint):String {
-        return "";
+        throw new Error("Unsupported operation");
     }
 
     public function get bytesAvailable():uint {
-        return 0;
+        throw new Error("Unsupported operation");
     }
 
     public function readObject():* {
@@ -101,17 +101,19 @@ class ArrayInput implements IDataInput {
     }
 
     public function get objectEncoding():uint {
-        return 0;
+        throw new Error("Unsupported operation");
     }
 
     public function set objectEncoding(version:uint):void {
+        throw new Error("Unsupported operation");
     }
 
     public function get endian():String {
-        return "";
+        throw new Error("Unsupported operation");
     }
 
     public function set endian(type:String):void {
+        throw new Error("Unsupported operation");
     }
 }
 
@@ -123,6 +125,7 @@ class ArrayOutput implements IDataOutput {
     }
 
     public function writeBytes(bytes:ByteArray, offset:uint = 0, length:uint = 0):void {
+        throw new Error("Unsupported operation");
     }
 
     public function writeBoolean(value:Boolean):void {
@@ -154,6 +157,7 @@ class ArrayOutput implements IDataOutput {
     }
 
     public function writeMultiByte(value:String, charSet:String):void {
+        throw new Error("Unsupported operation");
     }
 
     public function writeUTF(value:String):void {
@@ -161,6 +165,7 @@ class ArrayOutput implements IDataOutput {
     }
 
     public function writeUTFBytes(value:String):void {
+        throw new Error("Unsupported operation");
     }
 
     public function writeObject(object:*):void {
@@ -168,16 +173,18 @@ class ArrayOutput implements IDataOutput {
     }
 
     public function get objectEncoding():uint {
-        return 0;
+        throw new Error("Unsupported operation");
     }
 
     public function set objectEncoding(version:uint):void {
+        throw new Error("Unsupported operation");
     }
 
     public function get endian():String {
-        return "";
+        throw new Error("Unsupported operation");
     }
 
     public function set endian(type:String):void {
+        throw new Error("Unsupported operation");
     }
 }

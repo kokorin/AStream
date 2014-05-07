@@ -10,13 +10,13 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamDeref;
-import ru.kokorin.astream.ref.AStreamNoDeref;
-import ru.kokorin.astream.ref.AStreamNoRef;
+import ru.kokorin.astream.ref.NoDeref;
+import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 [RunWith("org.flexunit.runners.Parameterized")]
-public class AStreamCollectionMapperTest {
+public class CollectionMapperTest {
     public static var TYPE_VALUES_PAIRS:Array = [
         [Array, [5, 2.5, -12]],
         [Array, ["Quot \" Apos \' amp & lt < gt > Me!", "Test Me123", 123]],
@@ -28,15 +28,15 @@ public class AStreamCollectionMapperTest {
     ];
 
     private const registry:AStreamRegistry = new AStreamRegistry();
-    private const noRef:AStreamRef = new AStreamNoRef();
-    private const noDeref:AStreamDeref = new AStreamNoDeref();
+    private const noRef:AStreamRef = new NoRef();
+    private const noDeref:AStreamDeref = new NoDeref();
 
     [Test(dataProvider="TYPE_VALUES_PAIRS")]
     public function test(type:Class, items:Array):void {
         const info:ClassInfo = ClassInfo.forClass(type);
         const values:Object = info.newInstance([]);
         TypeUtil.addToCollection(values, items);
-        const collectionMapper:AStreamCollectionMapper = new AStreamCollectionMapper(info, registry);
+        const collectionMapper:CollectionMapper = new CollectionMapper(info, registry);
 
         const xml:XML = collectionMapper.toXML(values, noRef);
         const restored:Object = collectionMapper.fromXML(xml, noDeref);

@@ -10,8 +10,8 @@ import ru.kokorin.astream.metadata.AStreamImplicit;
 import ru.kokorin.astream.metadata.AStreamOmitField;
 import ru.kokorin.astream.metadata.AStreamOrder;
 import ru.kokorin.astream.ref.AStreamDeref;
-import ru.kokorin.astream.ref.AStreamIdDeref;
-import ru.kokorin.astream.ref.AStreamIdRef;
+import ru.kokorin.astream.ref.IdDeref;
+import ru.kokorin.astream.ref.IdRef;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
@@ -21,8 +21,13 @@ public class AStream {
     private const processedClasses:Array = new Array();
 
     private static var metadataRegistered:Boolean = false;
-    private static const metadataClasses:Array = [AStreamAlias, AStreamAsAttribute, AStreamOmitField, AStreamImplicit,
-                                                    AStreamOrder];
+    private static const metadataClasses:Array = [
+        AStreamAlias,
+        AStreamAsAttribute,
+        AStreamOmitField,
+        AStreamImplicit,
+        AStreamOrder
+    ];
 
     private static function registerMetadata():void {
         if (metadataRegistered) {
@@ -34,10 +39,6 @@ public class AStream {
         metadataRegistered = true;
     }
 
-    //TODO NaN
-    //TODO enhance Date
-    //TODO IExternalizable
-    //TODO cross-reference and cycle mods
     public function AStream() {
         registerMetadata();
     }
@@ -80,14 +81,14 @@ public class AStream {
         if (object != null && !isNaN(object as Number)) {
             classInfo = ClassInfo.forInstance(object);
         }
-        const ref:AStreamRef = new AStreamIdRef();
+        const ref:AStreamRef = new IdRef();
         const result:XML = registry.getMapperForClass(classInfo).toXML(object, ref);
         ref.clear();
         return result;
     }
 
     public function fromXML(xml:XML):Object {
-        const deref:AStreamDeref = new AStreamIdDeref();
+        const deref:AStreamDeref = new IdDeref();
         const result:Object = registry.getMapperForName(xml.name()).fromXML(xml, deref);
         deref.clear();
         return result;

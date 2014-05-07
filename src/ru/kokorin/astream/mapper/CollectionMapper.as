@@ -4,9 +4,9 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.util.TypeUtil;
 
-public class AStreamCollectionMapper extends AStreamSequenceMapper {
+public class CollectionMapper extends SequenceMapper {
 
-    public function AStreamCollectionMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function CollectionMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
         super(classInfo, registry);
     }
 

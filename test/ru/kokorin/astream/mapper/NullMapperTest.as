@@ -2,8 +2,8 @@ package ru.kokorin.astream.mapper {
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNull;
 
-public class AStreamNullMapperTest {
-    private static const nullMapper:AStreamNullMapper = new AStreamNullMapper();
+public class NullMapperTest {
+    private static const nullMapper:NullMapper = new NullMapper();
 
     [Test]
     public function testToXML():void {

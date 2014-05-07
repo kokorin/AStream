@@ -1,5 +1,5 @@
 package ru.kokorin.astream.ref {
-public class AStreamNoDeref implements AStreamDeref {
+public class NoDeref implements AStreamDeref {
     public function addRef(value:Object, xml:XML):void {
     }
 

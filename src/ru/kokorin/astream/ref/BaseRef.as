@@ -2,7 +2,7 @@ package ru.kokorin.astream.ref {
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
-public class AStreamBaseRef implements AStreamRef {
+public class BaseRef implements AStreamRef {
     private const classMap:Map = new Map();
 
     public function hasRef(object:Object):Boolean {

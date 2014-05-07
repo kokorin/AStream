@@ -1,5 +1,5 @@
 package ru.kokorin.astream.ref {
-public class AStreamIdRef extends AStreamBaseRef {
+public class IdRef extends BaseRef {
     private var nextId:int = 1;
 
     override public function clear():void {

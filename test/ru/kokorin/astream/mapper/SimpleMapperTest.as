@@ -7,7 +7,7 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import ru.kokorin.astream.AStreamRegistry;
 
 [RunWith("org.flexunit.runners.Parameterized")]
-public class AStreamSimpleMapperTest {
+public class SimpleMapperTest {
     public static var TYPE_VALUE_PAIRS:Array = [
         [Number, 5],
         [Number, 2.5],
@@ -23,7 +23,7 @@ public class AStreamSimpleMapperTest {
     [Test(dataProvider="TYPE_VALUE_PAIRS")]
     public function test(type:Class, value:Object):void {
         const info:ClassInfo = ClassInfo.forClass(type);
-        const simpleMapper:AStreamSimpleMapper = new AStreamSimpleMapper(info, registry);
+        const simpleMapper:SimpleMapper = new SimpleMapper(info, registry);
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Object = simpleMapper.fromXML(xml, null);
 
@@ -34,7 +34,7 @@ public class AStreamSimpleMapperTest {
     public function testDate():void {
         const info:ClassInfo = ClassInfo.forClass(Date);
         const value:Date = new Date();
-        const simpleMapper:AStreamSimpleMapper = new AStreamSimpleMapper(info, registry);
+        const simpleMapper:SimpleMapper = new SimpleMapper(info, registry);
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Date = simpleMapper.fromXML(xml, null) as Date;
 

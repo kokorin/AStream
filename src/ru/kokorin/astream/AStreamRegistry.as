@@ -1,11 +1,12 @@
 package ru.kokorin.astream {
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
+import org.spicefactory.lib.reflect.Converter;
+import org.spicefactory.lib.reflect.Converters;
 
-import ru.kokorin.astream.mapper.AStreamComplexMapper;
+import ru.kokorin.astream.converter.DateConverter;
+import ru.kokorin.astream.converter.NumberConverter;
 import ru.kokorin.astream.mapper.AStreamMapper;
-import ru.kokorin.astream.mapper.AStreamNullMapper;
-import ru.kokorin.astream.mapper.AStreamSimpleMapper;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class AStreamRegistry {
@@ -14,9 +15,27 @@ public class AStreamRegistry {
     private const aliasMap:Map = new Map();
     private const mapperFactory:AStreamMapperFactory = new AStreamMapperFactory();
     private static const VECTOR_ALIAS:String = "vector-";
+    private static const converters:Array = [
+        [Date, new DateConverter()],
+        [Number, new NumberConverter()]
+    ];
+    private static var convertersRegistered:Boolean = false;
 
     public function AStreamRegistry() {
         alias("null", null);
+        registerConverters();
+    }
+
+    private static function registerConverters():void {
+        if (convertersRegistered) {
+            return;
+        }
+        for each (var typeConverterPair:Array in converters) {
+            var type:Class = typeConverterPair[0] as Class;
+            var converter:Converter = typeConverterPair[1] as Converter;
+            Converters.addConverter(type, converter);
+        }
+        convertersRegistered = true;
     }
 
     public function getMapperForClass(classInfo:ClassInfo):AStreamMapper {

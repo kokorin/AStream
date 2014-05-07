@@ -1,5 +1,5 @@
 package ru.kokorin.astream.ref {
-public class AStreamNoRef implements AStreamRef {
+public class NoRef implements AStreamRef {
     public function hasRef(object:Object):Boolean {
         return false;
     }

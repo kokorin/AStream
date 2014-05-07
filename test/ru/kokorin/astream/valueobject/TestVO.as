@@ -4,8 +4,8 @@ import flash.utils.getQualifiedClassName;
 public class TestVO {
     public var name:String;
     public var value1:Number;
-    public var value2:int;
-    public var value3:uint;
+    public var value2:int = 2147483640;
+    public var value3:uint = 4294967290;
     public var value4:Object;
     public var checked:Boolean;
     public var children:Array;

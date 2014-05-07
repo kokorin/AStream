@@ -9,11 +9,11 @@ import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
 
-public class AStreamByteArrayMapper implements AStreamMapper {
+public class ByteArrayMapper implements AStreamMapper {
     private var classInfo:ClassInfo;
     private var registry:AStreamRegistry;
 
-    public function AStreamByteArrayMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function ByteArrayMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
         this.classInfo = classInfo;
         this.registry = registry;
     }
