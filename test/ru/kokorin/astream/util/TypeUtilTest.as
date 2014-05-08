@@ -14,7 +14,7 @@ import ru.kokorin.astream.valueobject.TestVO;
 public class TypeUtilTest {
     public static var SIMPLE_TYPES:Array = [[Number], [int], [uint], [Boolean], [String]];
     [Test(dataProvider="SIMPLE_TYPES")]
-    public function testIsSimple(type:Class) {
+    public function testIsSimple(type:Class):void {
         const info:ClassInfo = ClassInfo.forClass(type);
 
         assertTrue("Expected to be SIMPLE: " + info.name, TypeUtil.isSimple(info));
@@ -22,7 +22,7 @@ public class TypeUtilTest {
 
     public static var COMPLEX_TYPES:Array = [[TestVO]];
     [Test(dataProvider="COMPLEX_TYPES")]
-    public function testIsComplex(type:Class) {
+    public function testIsComplex(type:Class):void {
         const info:ClassInfo = ClassInfo.forClass(type);
 
         assertFalse("Expected to be COMPLEX: " + info.name, TypeUtil.isSimple(info));
@@ -40,7 +40,7 @@ public class TypeUtilTest {
         [Vector.<TestVO>]
     ];
     [Test(dataProvider="COLLECTION_TYPES")]
-    public function testIsCollection(type:Class) {
+    public function testIsCollection(type:Class):void {
         const info:ClassInfo = ClassInfo.forClass(type);
         const collection:Object = new type();
         const collectionInfo:ClassInfo = ClassInfo.forInstance(collection);
@@ -55,7 +55,7 @@ public class TypeUtilTest {
         [Vector.<TestVO>, TestVO]
     ];
     [Test(dataProvider="VECTOR_TYPES")]
-    public function testVector(type:Class, itemType:Class) {
+    public function testVector(type:Class, itemType:Class):void {
         const info:ClassInfo = ClassInfo.forClass(type);
 
         assertTrue("Expected to be a VECTOR: " + info.name, TypeUtil.isVector(info));
@@ -64,7 +64,7 @@ public class TypeUtilTest {
 
     public static var NOT_COLLECTION_TYPES:Array = [[TestVO], [Number], [Boolean]];
     [Test(dataProvider="NOT_COLLECTION_TYPES")]
-    public function testIsNotCollection(type:Class) {
+    public function testIsNotCollection(type:Class):void {
         const info:ClassInfo = ClassInfo.forClass(type);
 
         assertFalse("Expected not to be a COLLECTION: " + info.name, TypeUtil.isCollection(info));

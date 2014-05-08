@@ -10,10 +10,13 @@ import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class AStreamRegistry {
+    private var _autodetectMetadata:Boolean = false;
+    private var metadataProcessor:AStreamMetadataProcessor;
     private const mapperMap:Map = new Map();
     private const classDataMap:Map = new Map();
     private const aliasMap:Map = new Map();
     private const mapperFactory:AStreamMapperFactory = new AStreamMapperFactory();
+
     private static const VECTOR_ALIAS:String = "vector-";
     private static const converters:Array = [
         [Date, new DateConverter()],
@@ -23,6 +26,7 @@ public class AStreamRegistry {
 
     public function AStreamRegistry() {
         alias("null", null);
+        metadataProcessor = new AStreamMetadataProcessor(this);
         registerConverters();
     }
 
@@ -38,9 +42,21 @@ public class AStreamRegistry {
         convertersRegistered = true;
     }
 
+    public function autodetectMetadata(value:Boolean):void {
+        _autodetectMetadata = value;
+    }
+
+    public function processMetadata(classInfo:ClassInfo):void {
+        metadataProcessor.processMetadata(classInfo);
+        autodetectMetadata(false);
+    }
+
     public function getMapperForClass(classInfo:ClassInfo):AStreamMapper {
         var mapper:AStreamMapper = mapperMap.get(classInfo);
         if (!mapper) {
+            if (_autodetectMetadata) {
+                metadataProcessor.processMetadata(classInfo);
+            }
             mapper = mapperFactory.createMapper(classInfo, this);
             mapperMap.put(classInfo, mapper);
         }

@@ -16,37 +16,14 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class AStream {
-    private var _autodetectMetadata:Boolean = false;
     private const registry:AStreamRegistry = new AStreamRegistry();
-    private const processedClasses:Array = new Array();
-
-    private static var metadataRegistered:Boolean = false;
-    private static const metadataClasses:Array = [
-        AStreamAlias,
-        AStreamAsAttribute,
-        AStreamOmitField,
-        AStreamImplicit,
-        AStreamOrder
-    ];
-
-    private static function registerMetadata():void {
-        if (metadataRegistered) {
-            return;
-        }
-        for each (var metadataClass:Class in metadataClasses) {
-            Metadata.registerMetadataClass(metadataClass);
-        }
-        metadataRegistered = true;
-    }
 
     public function AStream() {
-        registerMetadata();
     }
 
     public function processMetadata(clazz:Class):void {
         const classInfo:ClassInfo = ClassInfo.forClass(clazz);
-        processClassMetadata(classInfo);
-        autodetectMetadata(false);
+        registry.processMetadata(classInfo);
     }
 
     public function alias(name:String, clazz:Class):void {
@@ -70,13 +47,10 @@ public class AStream {
     }
 
     public function autodetectMetadata(value:Boolean):void {
-        _autodetectMetadata = value;
+        registry.autodetectMetadata(value);
     }
 
     public function toXML(object:Object):XML {
-        if (_autodetectMetadata) {
-            processInstanceMetadata(object);
-        }
         var classInfo:ClassInfo = null;
         if (object != null && !isNaN(object as Number)) {
             classInfo = ClassInfo.forInstance(object);
@@ -92,78 +66,6 @@ public class AStream {
         const result:Object = registry.getMapperForName(xml.name()).fromXML(xml, deref);
         deref.clear();
         return result;
-    }
-
-    private function processClassMetadata(classInfo:ClassInfo):void {
-        const objectInfo:ClassInfo = ClassInfo.forClass(Object);
-        while (classInfo && classInfo != objectInfo) {
-            if (processedClasses.indexOf(classInfo) != -1) {
-                break;
-            }
-            var alias:String = getAlias(classInfo);
-            if (alias) {
-                registry.alias(alias, classInfo);
-            }
-            processedClasses.push(classInfo);
-
-            for each (var property:Property in classInfo.getProperties()) {
-                if (getMetadata(property, AStreamOmitField)) {
-                    registry.omit(classInfo, property.name);
-                    continue;
-                }
-                processClassMetadata(property.type);
-                var propertyAlias:String = getAlias(property);
-                if (propertyAlias) {
-                    registry.aliasProperty(propertyAlias, classInfo, property.name);
-                }
-                if (getMetadata(property, AStreamAsAttribute)) {
-                    registry.attribute(classInfo, property.name);
-                }
-                var orderMeta:AStreamOrder = getMetadata(property, AStreamOrder) as AStreamOrder;
-                if (orderMeta) {
-                    registry.order(orderMeta.order, classInfo, property.name);
-                }
-                var implicitMeta:AStreamImplicit = getMetadata(property, AStreamImplicit) as AStreamImplicit;
-                if (implicitMeta) {
-                    registry.implicitCollection(classInfo, property.name, implicitMeta.itemName, ClassInfo.forName(implicitMeta.itemType));
-                }
-            }
-
-            classInfo = ClassInfo.forClass(classInfo.getSuperClass());
-        }
-    }
-
-    private function processInstanceMetadata(instance:Object):void {
-        //TODO возможны циклические ссылки
-        const classInfo:ClassInfo = ClassInfo.forInstance(instance);
-        processClassMetadata(classInfo);
-        for each (var property:Property in classInfo.getProperties()) {
-            var value:Object = property.getValue(instance);
-            var valueInfo:ClassInfo = ClassInfo.forInstance(value);
-            if (TypeUtil.isCollection(valueInfo)) {
-                for each (var item:Object in value) {
-                    processInstanceMetadata(item);
-                }
-            } else if (!TypeUtil.isSimple(valueInfo)) {
-                processInstanceMetadata(value);
-            }
-        }
-    }
-
-    private static function getMetadata(metadataAware:MetadataAware, metadata:Class):Object {
-        const metaArray:Array = metadataAware.getMetadata(metadata);
-        if (metaArray && metaArray.length > 0) {
-            return metaArray[0];
-        }
-        return null;
-    }
-
-    private static function getAlias(metadataAware:MetadataAware):String {
-        const aliasMeta:AStreamAlias = getMetadata(metadataAware, AStreamAlias) as AStreamAlias;
-        if (aliasMeta) {
-            return aliasMeta.name;
-        }
-        return null;
     }
 }
 }
