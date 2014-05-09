@@ -30,9 +30,9 @@ public class AStreamMetadataProcessorTest {
         assertEquals("Implicit vector's item name", registry.getImplicitItemName(metaInfo, "vector"), "vectorItem");
         assertEquals("Implicit vector's item type", registry.getImplicitItemType(metaInfo, "vector").getClass(), String);
 
-        assertEquals("Property order", registry.getOrder(metaInfo, "name"), 10);
-        assertEquals("Property order", registry.getOrder(metaInfo, "list"), 20);
-        assertEquals("Property order", registry.getOrder(metaInfo, "vector"), 30);
+        assertEquals("Property order (name)", registry.getOrder(metaInfo, "name"), 10);
+        assertEquals("Property order (list)", registry.getOrder(metaInfo, "list"), 20);
+        assertEquals("Property order (vector)", registry.getOrder(metaInfo, "vector"), 30);
     }
 }
 }

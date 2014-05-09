@@ -3,6 +3,7 @@ import flash.utils.getQualifiedClassName;
 
 public class TestVO {
     public var name:String;
+    public var enum:EnumVO;
     public var value1:Number;
     public var value2:int = 2147483640;
     public var value3:uint = 4294967290;
@@ -14,13 +15,13 @@ public class TestVO {
         this.name = name;
     }
 
-
     public function toString():String {
         return getQualifiedClassName(this) + "{name=" + String(name) + "}";
     }
 
     public function describe():String {
         return getQualifiedClassName(this) + "{name=" + String(name) +
+                ",enum=" + String(enum) +
                 ",value1=" + String(value1) +
                 ",value2=" + String(value2) +
                 ",value3=" + String(value3) +

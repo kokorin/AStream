@@ -1,11 +1,11 @@
 package ru.kokorin.astream.converter {
-public class DateConverter implements AStreamConverter {
+public class StringConverter implements AStreamConverter {
     public function fromString(string:String):Object {
-        return new Date(string);
+        return string;
     }
 
     public function toString(value:Object):String {
-        return String(value);
+        return value as String;
     }
 }
 }

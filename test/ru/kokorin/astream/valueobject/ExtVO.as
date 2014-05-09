@@ -10,6 +10,7 @@ public class ExtVO extends TestVO implements IExternalizable {
 
     public function writeExternal(output:IDataOutput):void {
         output.writeUTF(name);
+        output.writeObject(enum);
         output.writeFloat(value1);
         output.writeInt(value2);
         output.writeUnsignedInt(value3);
@@ -20,6 +21,7 @@ public class ExtVO extends TestVO implements IExternalizable {
 
     public function readExternal(input:IDataInput):void {
         name = input.readUTF();
+        enum = input.readObject() as EnumVO;
         value1 = input.readFloat();
         value2 = input.readInt();
         value3 = input.readUnsignedInt();

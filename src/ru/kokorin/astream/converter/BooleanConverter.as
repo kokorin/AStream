@@ -1,7 +1,7 @@
 package ru.kokorin.astream.converter {
-public class DateConverter implements AStreamConverter {
+public class BooleanConverter implements AStreamConverter {
     public function fromString(string:String):Object {
-        return new Date(string);
+        return string == "true";
     }
 
     public function toString(value:Object):String {

@@ -4,6 +4,7 @@ import org.spicefactory.lib.reflect.Converter;
 import org.spicefactory.lib.reflect.Converters;
 
 import ru.kokorin.astream.AStreamRegistry;
+import ru.kokorin.astream.converter.AStreamConverter;
 import ru.kokorin.astream.converter.DateConverter;
 import ru.kokorin.astream.converter.NumberConverter;
 import ru.kokorin.astream.ref.AStreamDeref;
@@ -27,15 +28,17 @@ public class SimpleMapper implements AStreamMapper {
 
     public function fromXML(xml:XML, deref:AStreamDeref):Object {
         var result:Object = null;
-        if (xml) {
-            result = Converters.convert(String(xml.text()), classInfo.getClass());
+        const converter:AStreamConverter = registry.getConverter(classInfo);
+        if (xml != null && converter != null) {
+            result = converter.fromString(String(xml.text()));
         }
         return result;
     }
 
     public function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
-        if (xml != null && instance != null) {
-            xml.appendChild(String(instance));
+        const converter:AStreamConverter = registry.getConverter(classInfo);
+        if (xml != null && instance != null && converter != null) {
+            xml.appendChild(converter.toString(instance));
         }
     }
 }

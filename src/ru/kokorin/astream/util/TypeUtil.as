@@ -1,9 +1,11 @@
 package ru.kokorin.astream.util {
+import as3.lang.Enum;
+
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 public class TypeUtil {
-    private static const SIMPLE_TYPES:Array = [Boolean, int, uint, Number, String, Date];
+    private static const SIMPLE_TYPES:Array = [Boolean, int, uint, Number, String, Date, Enum];
     private static const ILIST_TYPE:ClassInfo = getIListInfo();
     private static const IS_VECTOR_MAP:Map = new Map();
     private static const ITEM_TYPE_MAP:Map = new Map();

@@ -14,6 +14,7 @@ import ru.kokorin.astream.ref.NoDeref;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
+import ru.kokorin.astream.valueobject.EnumVO;
 
 [RunWith("org.flexunit.runners.Parameterized")]
 public class CollectionMapperTest {
@@ -24,7 +25,8 @@ public class CollectionMapperTest {
         [ArrayCollection, [-123, 123]],
         [Vector.<Boolean>, [false, true]],
         [Vector.<int>, [123, 33, 412, 0]],
-        [Vector.<uint>, [uint(321), uint(123), uint(0)]]
+        [Vector.<uint>, [uint(321), uint(123), uint(0)]],
+        [Vector.<EnumVO>, [EnumVO.FIRST, EnumVO.SECOND, EnumVO.THIRD]]
     ];
 
     private const registry:AStreamRegistry = new AStreamRegistry();

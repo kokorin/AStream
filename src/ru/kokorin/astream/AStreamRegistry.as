@@ -1,11 +1,8 @@
 package ru.kokorin.astream {
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
-import org.spicefactory.lib.reflect.Converter;
-import org.spicefactory.lib.reflect.Converters;
 
-import ru.kokorin.astream.converter.DateConverter;
-import ru.kokorin.astream.converter.NumberConverter;
+import ru.kokorin.astream.converter.AStreamConverter;
 import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.util.TypeUtil;
 
@@ -15,31 +12,24 @@ public class AStreamRegistry {
     private const mapperMap:Map = new Map();
     private const classDataMap:Map = new Map();
     private const aliasMap:Map = new Map();
+    private const converterMap:Map = new Map();
     private const mapperFactory:AStreamMapperFactory = new AStreamMapperFactory();
+    private const converterFactory:AStreamConverterFactory = new AStreamConverterFactory();
 
     private static const VECTOR_ALIAS:String = "vector-";
-    private static const converters:Array = [
-        [Date, new DateConverter()],
-        [Number, new NumberConverter()]
-    ];
-    private static var convertersRegistered:Boolean = false;
 
     public function AStreamRegistry() {
         alias("null", null);
         metadataProcessor = new AStreamMetadataProcessor(this);
-        registerConverters();
     }
 
-    private static function registerConverters():void {
-        if (convertersRegistered) {
-            return;
+    public function getConverter(classInfo:ClassInfo):AStreamConverter {
+        if (converterMap.containsKey(classInfo)) {
+            return converterMap.get(classInfo) as AStreamConverter;
         }
-        for each (var typeConverterPair:Array in converters) {
-            var type:Class = typeConverterPair[0] as Class;
-            var converter:Converter = typeConverterPair[1] as Converter;
-            Converters.addConverter(type, converter);
-        }
-        convertersRegistered = true;
+        const converter:AStreamConverter = converterFactory.createConverter(classInfo);
+        converterMap.put(classInfo, converter);
+        return converter;
     }
 
     public function autodetectMetadata(value:Boolean):void {

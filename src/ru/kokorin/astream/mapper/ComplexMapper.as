@@ -36,7 +36,7 @@ public class ComplexMapper implements AStreamMapper{
             var asImplicitCollection:Boolean = registry.getImplicitCollection(classInfo, property.name);
 
             if (asAttribute && TypeUtil.isSimple(property.type)) {
-                propertyHandler = new AttributeHandler(property, propertyAlias);
+                propertyHandler = new AttributeHandler(property, propertyAlias, registry);
             } else if (asImplicitCollection && TypeUtil.isCollection(property.type)) {
                 //TODO для вложенного списка необходимо задать itemName и itemType
                 var itemName:String = registry.getImplicitItemName(classInfo, property.name);
@@ -104,6 +104,7 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Property;
 
 import ru.kokorin.astream.AStreamRegistry;
+import ru.kokorin.astream.converter.AStreamConverter;
 import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
@@ -117,27 +118,29 @@ interface PropertyHandler {
 class AttributeHandler implements PropertyHandler {
     private var property:Property;
     private var name:String;
+    private var registry:AStreamRegistry;
 
-
-    public function AttributeHandler(property:Property, name:String) {
+    public function AttributeHandler(property:Property, name:String, registry:AStreamRegistry) {
         this.property = property;
         this.name = name;
+        this.registry = registry;
     }
 
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        if (value != null) {
-            parentXML.attribute(name)[0] = String(value);
+        const converter:AStreamConverter = registry.getConverter(property.type);
+        if (value != null && converter != null) {
+            parentXML.attribute(name)[0] = converter.toString(value);
         }
     }
 
     public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamDeref):void {
         const attValue:XML = parentXML.attribute(name)[0];
+        const converter:AStreamConverter = registry.getConverter(property.type);
         var value:Object = null;
-        if (attValue != null) {
-            value = String(attValue);
+        if (attValue != null && converter != null) {
+            value = converter.fromString(String(attValue));
         }
-        //setValue implicitly calls appropriate converter
         property.setValue(parentInstance, value);
     }
 }

@@ -5,6 +5,7 @@ import org.hamcrest.number.closeTo;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
+import ru.kokorin.astream.valueobject.EnumVO;
 
 [RunWith("org.flexunit.runners.Parameterized")]
 public class SimpleMapperTest {
@@ -15,7 +16,8 @@ public class SimpleMapperTest {
         [Boolean, false],
         [Boolean, true],
         [int, -123],
-        [uint, 321]
+        [uint, 321],
+        [EnumVO, EnumVO.FIRST]
     ];
 
     private const registry:AStreamRegistry = new AStreamRegistry();
