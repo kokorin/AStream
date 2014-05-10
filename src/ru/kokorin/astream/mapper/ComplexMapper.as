@@ -64,7 +64,7 @@ public class ComplexMapper implements AStreamMapper{
         process();
         const attRef:XML = xml.attribute("reference")[0];
         if (attRef) {
-            return deref.getValue(String(attRef));
+            return deref.getValue(String(attRef), xml);
         }
         const result:Object = classInfo.newInstance([]);
         deref.addRef(result, xml);
@@ -77,7 +77,7 @@ public class ComplexMapper implements AStreamMapper{
     public function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         process();
         if (ref.hasRef(instance)) {
-            xml.attribute("reference")[0] = ref.getRef(instance);
+            xml.attribute("reference")[0] = ref.getRef(instance, xml);
             return;
         }
         ref.addValue(instance, xml);

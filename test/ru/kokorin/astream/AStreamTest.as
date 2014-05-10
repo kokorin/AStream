@@ -10,6 +10,7 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.valueobject.TestVO;
 
+[RunWith("org.flexunit.runners.Parameterized")]
 public class AStreamTest {
     private var aStream:AStream;
 
@@ -67,26 +68,36 @@ public class AStreamTest {
         assertEquals("Restored and original", original.describe(), restored.describe());
     }
 
-    [Test]
-    public function testSingleReference():void {
+    public static var REFERENCE_MODES:Array = [
+        [AStreamMode.ID_REFERENCES],
+        [AStreamMode.SINGLE_NODE_XPATH_ABSOLUTE_REFERENCES],
+        [AStreamMode.SINGLE_NODE_XPATH_RELATIVE_REFERENCES],
+        [AStreamMode.XPATH_ABSOLUTE_REFERENCES],
+        [AStreamMode.XPATH_RELATIVE_REFERENCES]
+    ];
+
+    [Test(dataProvider="REFERENCE_MODES")]
+    public function testSingleReference(mode:AStreamMode):void {
         const original:TestVO = new TestVO("Root");
         original.children = [original];
         original.value4 = original;
 
+        aStream.mode = mode;
         const xml:XML = aStream.toXML(original);
         const restored:TestVO = aStream.fromXML(xml) as TestVO;
 
         assertNotNull("Restored object from XML", restored);
-        assertEquals("Restored contains self in child array", restored, restored.children[0]);
         assertEquals("Restored contains self in value4", restored, restored.value4);
+        assertEquals("Restored contains self in child array", restored, restored.children[0]);
     }
 
-    [Test]
-    public function testCollectionReference():void {
+    [Test(dataProvider="REFERENCE_MODES")]
+    public function testCollectionReference(mode:AStreamMode):void {
         const original:TestVO = new TestVO("Root");
         original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")];
         original.value4 = original.children;
 
+        aStream.mode = mode;
         const xml:XML = aStream.toXML(original);
         const restored:TestVO = aStream.fromXML(xml) as TestVO;
 

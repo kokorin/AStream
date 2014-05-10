@@ -12,7 +12,7 @@ public class BaseDeref implements AStreamDeref {
         refMap.put(ref, value);
     }
 
-    public function getValue(ref:String):Object {
+    public function getValue(ref:String, atNode:XML):Object {
         return refMap.get(ref);
     }
 

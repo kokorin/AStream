@@ -25,7 +25,7 @@ public class SequenceMapper implements AStreamMapper {
     public function fromXML(xml:XML, deref:AStreamDeref):Object {
         const attRef:XML = xml.attribute("reference")[0];
         if (attRef) {
-            return deref.getValue(String(attRef));
+            return deref.getValue(String(attRef), xml);
         }
         const result:Object = classInfo.newInstance([]);
         deref.addRef(result, xml);
@@ -41,7 +41,7 @@ public class SequenceMapper implements AStreamMapper {
 
     public function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         if (ref.hasRef(instance)) {
-            xml.attribute("reference")[0] = String(ref.getRef(instance));
+            xml.attribute("reference")[0] = String(ref.getRef(instance, xml));
             return;
         }
         ref.addValue(instance, xml);
@@ -54,9 +54,14 @@ public class SequenceMapper implements AStreamMapper {
                     if (itemValue != null) {
                         itemValueType = ClassInfo.forInstance(itemValue);
                     }
-                    var itemValueMapper:AStreamMapper = registry.getMapperForClass(itemValueType);
-                    var itemResult:XML = itemValueMapper.toXML(itemValue, ref);
+                    /* We have to add child tag to XML and only then fil that tag.
+                    * Otherwise relative XPath cannot be constructed properly. */
+                    const itemValueMapper:AStreamMapper = registry.getMapperForClass(itemValueType);
+                    const itemName:String = registry.getAlias(itemValueType);
+                    const itemResult:XML = <{itemName}/>;
                     xml.appendChild(itemResult);
+
+                    itemValueMapper.fillXML(itemValue, itemResult, ref);
                 }
         );
     }

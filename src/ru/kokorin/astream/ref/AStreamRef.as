@@ -1,10 +1,10 @@
 package ru.kokorin.astream.ref {
 public interface AStreamRef {
-    function hasRef(object:Object):Boolean;
+    function hasRef(toValue:Object):Boolean;
 
-    function addValue(value:Object, xml:XML):void;
+    function addValue(value:Object, atNode:XML):void;
 
-    function getRef(value:Object):String;
+    function getRef(toValue:Object, fromNode:XML):String;
 
     function clear():void;
 }
