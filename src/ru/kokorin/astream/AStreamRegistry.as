@@ -10,8 +10,10 @@ public class AStreamRegistry {
     private var _autodetectMetadata:Boolean = false;
     private var metadataProcessor:AStreamMetadataProcessor;
     private const mapperMap:Map = new Map();
+    private const packageByAliasMap:Map = new Map();
+    private const aliasByPackageMap:Map = new Map();
     private const classDataMap:Map = new Map();
-    private const aliasMap:Map = new Map();
+    private const classByAliasMap:Map = new Map();
     private const converterMap:Map = new Map();
     private const mapperFactory:AStreamMapperFactory = new AStreamMapperFactory();
     private const converterFactory:AStreamConverterFactory = new AStreamConverterFactory();
@@ -57,31 +59,59 @@ public class AStreamRegistry {
         return getMapperForClass(getClass(name));
     }
 
+    public function aliasPackage(name:String, pckg:String):void {
+        if (!name) {
+            name = "";
+        }
+        if (!pckg) {
+            pckg = "";
+        }
+        const oldName:String = aliasByPackageMap.get(pckg);
+        const oldPckg:String = packageByAliasMap.get(name);
+        if (oldName) {
+            packageByAliasMap.remove(oldName);
+        }
+        if (oldPckg) {
+            aliasByPackageMap.remove(oldPckg);
+        }
+        aliasByPackageMap.put(pckg, name);
+        packageByAliasMap.put(name, pckg);
+    }
     public function alias(name:String, classInfo:ClassInfo):void {
         const classData:ClassData = getClassData(classInfo);
         if (classData.alias) {
-            aliasMap.remove(classData.alias);
+            classByAliasMap.remove(classData.alias);
         }
         classData.alias = name;
-        aliasMap.put(name, classInfo);
+        classByAliasMap.put(name, classInfo);
     }
     public function getAlias(classInfo:ClassInfo):String {
-        //TODO необходимо учитывать алиасы на пакеты
-        var result:String = getClassData(classInfo).alias;
-        if (!result) {
-            if (TypeUtil.isVector(classInfo)) {
-                result = VECTOR_ALIAS + getAlias(TypeUtil.getVectorItemType(classInfo));
-            } else  {
-                result = classInfo.name.replace("::", ".");
-            }
+        const alias:String = getClassData(classInfo).alias;
+        if (alias) {
+            return alias;
         }
-        return result;
+
+        if (TypeUtil.isVector(classInfo)) {
+            return VECTOR_ALIAS + getAlias(TypeUtil.getVectorItemType(classInfo));
+        }
+
+        const pckgAndName:Array = classInfo.name.split("::");
+        if (pckgAndName.length == 1) {
+            pckgAndName.unshift("");
+        }
+        var pckg:String = pckgAndName[0] as String;
+        const name:String = pckgAndName[1] as String;
+        pckg = replaceByLongestMatch(pckg, aliasByPackageMap);
+        if (pckg != null && pckg.length > 0) {
+            return pckg + "." + name;
+        }
+        return name;
     }
 
-    private function getClass(nameOrAlias:String):ClassInfo {
-        //TODO необходимо учитывать алиасы на пакеты
-        if (aliasMap.containsKey(nameOrAlias)) {
-            return aliasMap.get(nameOrAlias);
+    /** Declared as internal for tests*/
+    internal function getClass(nameOrAlias:String):ClassInfo {
+        if (classByAliasMap.containsKey(nameOrAlias)) {
+            return classByAliasMap.get(nameOrAlias);
         }
 
         const beginsWithVector:Boolean = nameOrAlias.indexOf(VECTOR_ALIAS) == 0;
@@ -92,10 +122,13 @@ public class AStreamRegistry {
         }
 
         const lastDotIndex:int = nameOrAlias.lastIndexOf(".");
-        if (lastDotIndex != -1) {
-            nameOrAlias = nameOrAlias.substring(0, lastDotIndex) + "::" + nameOrAlias.substring(lastDotIndex+1);
+        var pckg:String = nameOrAlias.substring(0, lastDotIndex);
+        const name:String = nameOrAlias.substring(lastDotIndex+1);
+        pckg = replaceByLongestMatch(pckg, packageByAliasMap);
+        if (pckg != null && pckg != "") {
+            return ClassInfo.forName(pckg + "::" + name);
         }
-        return ClassInfo.forName(nameOrAlias);
+        return ClassInfo.forName(name);
     }
 
     public function aliasProperty(name:String, classInfo:ClassInfo, propertyName:String):void {
@@ -153,6 +186,27 @@ public class AStreamRegistry {
             classDataMap.put(classInfo, result);
         }
         return result;
+    }
+
+    private static function replaceByLongestMatch(pckg:String, replaceMap:Map):String {
+        if (pckg == null) {
+            return null;
+        }
+        var match:String = null;
+        for each (var test:String in replaceMap.keys) {
+            if (match != null && test.length < match.length) {
+                continue;
+            }
+            if (pckg == test || pckg.indexOf(test+".") == 0) {
+                match = test;
+            }
+        }
+        if (match != null) {
+            const replace:String = replaceMap.get(match) as String;
+            return replace + pckg.substr(match.length);
+        }
+
+        return pckg;
     }
 }
 }

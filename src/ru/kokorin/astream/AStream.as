@@ -39,7 +39,7 @@ public class AStream {
     }
 
     public function aliasPackage(name:String, pckg:String):void {
-        //TODO Implement me
+        registry.aliasPackage(name, pckg);
     }
 
     public function implicitCollection(clazz:Class, propertyName:String, itemName:String, itemClazz:Class):void {
