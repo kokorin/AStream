@@ -5,9 +5,9 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamDeref;
+import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.NoDeref;
 import ru.kokorin.astream.ref.NoRef;
-import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.valueobject.EnumVO;
 import ru.kokorin.astream.valueobject.ExtVO;
 

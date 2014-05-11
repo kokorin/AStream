@@ -5,14 +5,13 @@ import mx.collections.ArrayList;
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
 import org.hamcrest.collection.array;
-
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamDeref;
+import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.NoDeref;
 import ru.kokorin.astream.ref.NoRef;
-import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 import ru.kokorin.astream.valueobject.EnumVO;
 

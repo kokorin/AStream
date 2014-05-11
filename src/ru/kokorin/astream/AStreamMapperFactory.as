@@ -4,14 +4,11 @@ import flash.utils.IExternalizable;
 
 import org.spicefactory.lib.reflect.ClassInfo;
 
+import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.mapper.ByteArrayMapper;
-
 import ru.kokorin.astream.mapper.CollectionMapper;
-
 import ru.kokorin.astream.mapper.ComplexMapper;
 import ru.kokorin.astream.mapper.ExternalizableMapper;
-
-import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.mapper.NullMapper;
 import ru.kokorin.astream.mapper.SimpleMapper;
 import ru.kokorin.astream.util.TypeUtil;

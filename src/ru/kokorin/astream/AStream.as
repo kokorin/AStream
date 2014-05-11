@@ -2,7 +2,6 @@ package ru.kokorin.astream {
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.mapper.AStreamMapper;
-
 import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.IdDeref;
@@ -45,7 +44,7 @@ public class AStream {
                 deref = new XPathRelativeDeref(true);
                 break;
             }
-            case AStreamMode.XPATH_ABSOLUTE_REFERENCES:  {
+            case AStreamMode.XPATH_ABSOLUTE_REFERENCES: {
                 ref = new XPathAbsoluteRef(false);
                 deref = new XPathAbsoluteDeref(false);
                 break;

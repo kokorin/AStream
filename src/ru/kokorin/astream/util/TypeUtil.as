@@ -61,7 +61,7 @@ public class TypeUtil {
         }
         const collectionInfo:ClassInfo = ClassInfo.forInstance(collection);
         var item:Object;
-        //TODO possible optimization for array and vector with splice() method
+        //TODO possible optimization: for array and vector call splice() method
         if (collectionInfo.isType(Array)) {
             const array:Array = collection as Array;
             for each (item in items) {
@@ -86,7 +86,7 @@ public class TypeUtil {
         function callback(item:*, index:int, collection:Object):void;
      */
     public static function forEachInCollection(collection:Object, callback:Function):void {
-        if (callback == null) {
+        if (collection == null || callback == null) {
             return;
         }
         const collectionInfo:ClassInfo = ClassInfo.forInstance(collection);

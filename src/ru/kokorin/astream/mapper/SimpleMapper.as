@@ -1,12 +1,8 @@
 package ru.kokorin.astream.mapper {
 import org.spicefactory.lib.reflect.ClassInfo;
-import org.spicefactory.lib.reflect.Converter;
-import org.spicefactory.lib.reflect.Converters;
 
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.converter.AStreamConverter;
-import ru.kokorin.astream.converter.DateConverter;
-import ru.kokorin.astream.converter.NumberConverter;
 import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
 

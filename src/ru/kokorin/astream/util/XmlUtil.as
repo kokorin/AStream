@@ -41,7 +41,7 @@ public class XmlUtil {
         return result.join("/");
     }
 
-    public static function getRelativeXPath(toPath:String, fromPath):String {
+    public static function getRelativeXPath(toPath:String, fromPath:String):String {
         const toSplit:Array = toPath.split("/");
         const fromSplit:Array = fromPath.split("/");
 

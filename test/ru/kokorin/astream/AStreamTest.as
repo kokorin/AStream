@@ -77,7 +77,7 @@ public class AStreamTest {
     ];
 
     [Test(dataProvider="REFERENCE_MODES")]
-    public function testSingleReference(mode:AStreamMode):void {
+    public function testCircularReference(mode:AStreamMode):void {
         const original:TestVO = new TestVO("Root");
         original.children = [original];
         original.value4 = original;
@@ -103,6 +103,30 @@ public class AStreamTest {
 
         assertNotNull("Restored object from XML", restored);
         assertEquals("Restored.value4 equals Restored.children", restored.value4, restored.children);
+        assertThat("Restored children length", restored.children, arrayWithSize(original.children.length));
+    }
+
+    [Test(expects="Error")]
+    public function testCircularReferenceError():void {
+        const original:TestVO = new TestVO("Root");
+        original.value4 = original;
+
+        aStream.mode = AStreamMode.NO_REFERENCES;
+        const xml:XML = aStream.toXML(original);
+    }
+
+    [Test]
+    public function testMultipleReferences():void {
+        const original:TestVO = new TestVO("Root");
+        original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")];
+        original.value4 = original.children;
+
+        aStream.mode = AStreamMode.NO_REFERENCES;
+        const xml:XML = aStream.toXML(original);
+        const restored:TestVO = aStream.fromXML(xml) as TestVO;
+
+        assertNotNull("Restored object from XML", restored);
+        assertEquals("Restored.value4 like Restored.children", String(restored.value4), String(restored.children));
         assertThat("Restored children length", restored.children, arrayWithSize(original.children.length));
     }
 }

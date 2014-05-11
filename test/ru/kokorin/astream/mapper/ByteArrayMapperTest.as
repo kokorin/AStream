@@ -5,10 +5,7 @@ import flash.utils.ByteArray;
 
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
-
 import org.spicefactory.lib.reflect.ClassInfo;
-
-import ru.kokorin.astream.AStream;
 
 import ru.kokorin.astream.AStreamRegistry;
 
