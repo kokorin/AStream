@@ -11,6 +11,9 @@ public class TypeUtil {
     private static const ITEM_TYPE_MAP:Map = new Map();
     private static const VECTOR_NAME_REGEXP:RegExp = /__AS3__\.vec::Vector\.<(.*)>/;
 
+    /** Checks if supplied type is simple or not.
+     *  Enums (subtypes of as3.lang.Enum) are considered to be simple.
+     * @param classInfo - type to check*/
     public static function isSimple(classInfo:ClassInfo):Boolean {
         for each (var clazz:Class in SIMPLE_TYPES) {
             if (classInfo.isType(clazz)) {
@@ -20,10 +23,16 @@ public class TypeUtil {
         return false;
     }
 
+    /** Checks if supplied type implements mx.collections.IList interface.
+     *  Does not depend on IList.
+     *  @param classInfo - type to check*/
     public static function isList(classInfo:ClassInfo):Boolean {
         return ILIST_TYPE && classInfo.isType(ILIST_TYPE.getClass());
     }
 
+    /** Checks if supplied type is Vector.
+     *  Does not depend on Vector.
+     *  @param classInfo - type to check*/
     public static function isVector(classInfo:ClassInfo):Boolean {
         if (IS_VECTOR_MAP.containsKey(classInfo)) {
             return IS_VECTOR_MAP.get(classInfo) as Boolean;
@@ -39,6 +48,9 @@ public class TypeUtil {
         return result;
     }
 
+    /** Checks if supplied type is either Array, IList or Vector.
+     *  Does not depend on IList or Vector.
+     *  @param classInfo - type to check*/
     public static function isCollection(classInfo:ClassInfo):Boolean {
         return classInfo.isType(Array) || isList(classInfo) || isVector(classInfo);
     }
@@ -47,7 +59,6 @@ public class TypeUtil {
         if (isVector(classInfo)) {
             return ITEM_TYPE_MAP.get(classInfo) as ClassInfo;
         }
-        //TODO возможно стоит возвращать Object
         return null;
     }
 

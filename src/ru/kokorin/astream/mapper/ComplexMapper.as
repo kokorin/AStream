@@ -26,11 +26,14 @@ public class ComplexMapper implements AStreamMapper{
         const unorderedProperties:Array = classInfo.getProperties();
         const orderedProperties:Array = unorderedProperties.concat().sort(compareProperties);
         for each (var property:Property in orderedProperties) {
-            if (registry.getOmit(classInfo, property.name)) {
+            //If property cannot be properly mapped it should be omitted
+            if (registry.getOmit(classInfo, property.name) ||
+                    !property.readable || !property.writable)
+            {
                 continue;
             }
 
-            var propertyHandler:PropertyHandler;
+            var propertyHandler:PropertyHandler = null;
             var propertyAlias:String = registry.getAliasProperty(classInfo, property.name);
             var asAttribute:Boolean = registry.getAttribute(classInfo, property.name);
             var asImplicitCollection:Boolean = registry.getImplicitCollection(classInfo, property.name);
@@ -38,17 +41,20 @@ public class ComplexMapper implements AStreamMapper{
             if (asAttribute && TypeUtil.isSimple(property.type)) {
                 propertyHandler = new AttributeHandler(property, propertyAlias, registry);
             } else if (asImplicitCollection && TypeUtil.isCollection(property.type)) {
-                //TODO для вложенного списка необходимо задать itemName и itemType
                 var itemName:String = registry.getImplicitItemName(classInfo, property.name);
-                //TODO получить тип элемента через TypeUtil.getItemType
                 var itemType:ClassInfo = registry.getImplicitItemType(classInfo, property.name);
-                propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
-            } else {
+                if (!itemType && TypeUtil.isVector(property.type)) {
+                    itemType = TypeUtil.getVectorItemType(property.type);
+                }
+                if (itemName != null && itemName != "" && itemType != null) {
+                    propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
+                }
+            }
+            // Fall back to ChildElementHandler
+            if (propertyHandler == null) {
                 propertyHandler = new ChildElementHandler(property, propertyAlias, registry);
             }
-            if (propertyHandler) {
-                handlers.push(propertyHandler);
-            }
+            handlers.push(propertyHandler);
         }
         processed = true;
     }

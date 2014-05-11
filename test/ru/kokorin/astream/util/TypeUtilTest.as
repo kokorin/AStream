@@ -52,7 +52,8 @@ public class TypeUtilTest {
     public static var VECTOR_TYPES:Array = [
         [Vector.<int>, int],
         [Vector.<Object>, Object],
-        [Vector.<TestVO>, TestVO]
+        [Vector.<TestVO>, TestVO]/*,
+        [Vector.<*>, Object]*/
     ];
     [Test(dataProvider="VECTOR_TYPES")]
     public function testVector(type:Class, itemType:Class):void {
