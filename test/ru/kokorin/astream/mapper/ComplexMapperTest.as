@@ -46,7 +46,7 @@ public class ComplexMapperTest {
     public function testImplicitCollection():void {
         const testInfo:ClassInfo = ClassInfo.forClass(TestVO)
         registry.implicitCollection(testInfo, "children", "child", testInfo);
-        original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")]
+        original.children = [new TestVO("First"), null, new TestVO("Third")]
         const complexMapper:ComplexMapper = new ComplexMapper(testInfo, registry);
 
         const xml:XML = complexMapper.toXML(original, noRef);
