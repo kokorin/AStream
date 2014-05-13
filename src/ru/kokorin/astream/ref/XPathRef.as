@@ -1,12 +1,10 @@
 package ru.kokorin.astream.ref {
-public class XPathRef implements AStreamRef {
-    private var forceSingleNode:Boolean;
+public class XPathRef extends BaseRef implements AStreamRef {
     private var relative:Boolean;
     private const instanceXPathPairs:Array = new Array();
-    private const currentNodePath:Array = new Array();
 
     public function XPathRef(forceSingleNode:Boolean, relative:Boolean) {
-        this.forceSingleNode = forceSingleNode;
+        super(forceSingleNode);
         this.relative = relative;
         clear();
     }
@@ -14,7 +12,7 @@ public class XPathRef implements AStreamRef {
     public function addValue(value:Object):void {
         const pair:InstancePathPair = new InstancePathPair();
         pair.instance = value;
-        pair.xPath = nodePathToXPath(currentNodePath);
+        pair.xPath = getCurrentXPath();
         instanceXPathPairs.push(pair);
     }
 
@@ -60,40 +58,9 @@ public class XPathRef implements AStreamRef {
         return null;
     }
 
-    public function beginNode(nodeName:String):void {
-        var nodeIndex:int = 0;
-        if (currentNodePath.length > 0) {
-            const currentNodeData:NodeData = currentNodePath[currentNodePath.length-1] as NodeData;
-            if (currentNodeData.childNodeCount.containsKey(nodeName)) {
-                nodeIndex = (currentNodeData.childNodeCount.get(nodeName) as int) + 1;
-            }
-            currentNodeData.childNodeCount.put(nodeName, nodeIndex);
-        }
-        currentNodePath.push(new NodeData(nodeName, nodeIndex));
-    }
-
-    public function endNode():void {
-        const nodeData:NodeData = currentNodePath.pop() as NodeData;
-        nodeData.childNodeCount.removeAll();
-    }
-
-    public function clear():void {
+    override public function clear():void {
+        super.clear();
         instanceXPathPairs.splice(0);
-        currentNodePath.splice(0);
-        currentNodePath.push(new NodeData("", 0));
-    }
-
-    private function nodePathToXPath(nodePath:Array):Array {
-        var result:Array = new Array();
-        for (var i:int = 0; i < nodePath.length; i++) {
-            var nodeData:NodeData = nodePath[i] as NodeData;
-            var indexStr:String = "";
-            if (i > 0 && (nodeData.index > 0 || forceSingleNode)) {
-                indexStr = "[" + (nodeData.index+1) + "]";
-            }
-            result.push(nodeData.name + indexStr);
-        }
-        return result;
     }
 
     private function getAbsoluteXPath(relativeXPath:Array):Array {
@@ -101,7 +68,7 @@ public class XPathRef implements AStreamRef {
             return relativeXPath;
         }
         relativeXPath = relativeXPath.concat();
-        const result:Array = nodePathToXPath(currentNodePath);
+        const result:Array = getCurrentXPath();
         while (relativeXPath.length > 0) {
             var part:String = relativeXPath.shift() as String;
             if (part == "..") {
@@ -118,7 +85,7 @@ public class XPathRef implements AStreamRef {
             return toXPath;
         }
         toXPath = toXPath.concat();
-        const fromXPath:Array = nodePathToXPath(currentNodePath);
+        const fromXPath:Array = getCurrentXPath();
         while (toXPath.length > 0 && fromXPath.length > 0) {
             if (toXPath[0] != fromXPath[0]) {
                 break;
@@ -142,28 +109,7 @@ public class XPathRef implements AStreamRef {
 }
 }
 
-import org.spicefactory.lib.collection.Map;
-
 class InstancePathPair {
     public var instance:Object;
     public var xPath:Array;
-}
-
-class NodeData {
-    private var _name:String;
-    private var _index:int = 0;
-    public const childNodeCount:Map = new Map();
-
-    public function NodeData(name:String, index:int) {
-        _name = name;
-        _index = index;
-    }
-
-    public function get name():String {
-        return _name;
-    }
-
-    public function get index():int {
-        return _index;
-    }
 }

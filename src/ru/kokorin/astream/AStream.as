@@ -3,6 +3,7 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.ref.AStreamRef;
+import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.ref.XPathRef;
 
 public class AStream {
@@ -15,7 +16,10 @@ public class AStream {
 
     public function set mode(value:AStreamMode):void {
         switch (value) {
-            case AStreamMode.NO_REFERENCES:
+            case AStreamMode.NO_REFERENCES: {
+                ref = new NoRef();
+                break;
+            }
             case AStreamMode.ID_REFERENCES:
             case AStreamMode.SINGLE_NODE_XPATH_ABSOLUTE_REFERENCES: {
                 ref = new XPathRef(true, false);

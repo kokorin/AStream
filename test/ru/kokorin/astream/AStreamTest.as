@@ -123,14 +123,13 @@ public class AStreamTest {
         assertThat("Restored children length", restored.children, arrayWithSize(original.children.length));
     }
 
-    [Ignore]
     [Test(expects="Error")]
     public function testCircularReferenceError():void {
         const original:TestVO = new TestVO("Root");
         original.value4 = original;
 
         aStream.mode = AStreamMode.NO_REFERENCES;
-        const xml:XML = aStream.toXML(original);
+        aStream.toXML(original);
     }
 
     [Test]
