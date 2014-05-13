@@ -3,7 +3,6 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
-import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class SequenceMapper extends BaseMapper {

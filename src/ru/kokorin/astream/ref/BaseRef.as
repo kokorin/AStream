@@ -46,7 +46,6 @@ public class BaseRef {
 
 import org.spicefactory.lib.collection.Map;
 
-
 class NodeData {
     private var _name:String;
     private var _index:int = 0;

@@ -218,7 +218,6 @@ import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.converter.AStreamConverter;
-
 import ru.kokorin.astream.mapper.AStreamMapper;
 
 class ClassData {
