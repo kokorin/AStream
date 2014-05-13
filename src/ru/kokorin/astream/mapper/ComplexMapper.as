@@ -3,20 +3,16 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Property;
 
 import ru.kokorin.astream.*;
-import ru.kokorin.astream.ref.AStreamDeref;
+import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
-public class ComplexMapper implements AStreamMapper{
-    private var classInfo:ClassInfo;
-    private var registry:AStreamRegistry;
+public class ComplexMapper extends BaseMapper {
     private var processed:Boolean = false;
     private const handlers:Array = new Array();
 
-
     public function ComplexMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
-        this.classInfo = classInfo;
-        this.registry = registry;
+        super(classInfo, registry);
     }
 
     public function process():void {
@@ -59,37 +55,26 @@ public class ComplexMapper implements AStreamMapper{
         processed = true;
     }
 
-    public function toXML(instance:Object, ref:AStreamRef):XML {
-        const name:String = registry.getAlias(classInfo);
-        const result:XML = <{name}/>;
-        fillXML(instance, result, ref);
-        return result;
-    }
-
-    public function fromXML(xml:XML, deref:AStreamDeref):Object {
+    override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
+        super.fillXML(instance, xml, ref);
         process();
-        const attRef:XML = xml.attribute("reference")[0];
-        if (attRef) {
-            return deref.getValue(String(attRef), xml);
-        }
-        const result:Object = classInfo.newInstance([]);
-        deref.addRef(result, xml);
-        for each (var handler:PropertyHandler in handlers) {
-            handler.fromXML(xml, result, deref);
-        }
-        return result;
-    }
-
-    public function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
-        process();
-        if (ref.hasRef(instance)) {
-            xml.attribute("reference")[0] = ref.getRef(instance, xml);
-            return;
-        }
-        ref.addValue(instance, xml);
         for each (var handler:PropertyHandler in handlers) {
             handler.toXML(instance, xml, ref);
         }
+    }
+
+    override protected function fillObject(instance:Object, xml:XML, ref:AStreamRef):void {
+        super.fillObject(instance, xml, ref);
+        process();
+        for each (var handler:PropertyHandler in handlers) {
+            handler.fromXML(xml, instance, ref);
+        }
+    }
+
+    override public function reset():void {
+        super.reset();
+        handlers.splice(0);
+        processed = false;
     }
 
     private function compareProperties(prop1:Property, prop2:Property):int {
@@ -112,13 +97,13 @@ import org.spicefactory.lib.reflect.Property;
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.converter.AStreamConverter;
 import ru.kokorin.astream.mapper.AStreamMapper;
-import ru.kokorin.astream.ref.AStreamDeref;
+import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 interface PropertyHandler {
     function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void;
-    function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamDeref):void;
+    function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void;
 }
 
 class AttributeHandler implements PropertyHandler {
@@ -140,7 +125,7 @@ class AttributeHandler implements PropertyHandler {
         }
     }
 
-    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamDeref):void {
+    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         const attValue:XML = parentXML.attribute(name)[0];
         const converter:AStreamConverter = registry.getConverter(property.type);
         var value:Object = null;
@@ -165,31 +150,28 @@ class ChildElementHandler implements PropertyHandler {
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
         if (value != null) {
-            const result:XML = <{name}/>;
-            parentXML.appendChild(result);
-
             const valueType:ClassInfo = ClassInfo.forInstance(value);
+            const valueMapper:AStreamMapper = registry.getMapper(valueType);
+            const result:XML = valueMapper.toXML(value, ref, name);
             /* Integer numbers are always of type int, not Number!
              * i.e. (10 is int) == true and (10.1 is Number) == true */
             if (!TypeUtil.isSimple(property.type) && valueType != property.type) {
                 result.attribute("class")[0] = registry.getAlias(valueType);
             }
-
-            const valueMapper:AStreamMapper = registry.getMapperForClass(valueType);
-            valueMapper.fillXML(value, result, ref);
+            parentXML.appendChild(result);
         }
     }
 
-    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamDeref):void {
+    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         const elementValue:XML = parentXML.elements(name)[0];
         var value:Object;
         if (elementValue != null) {
             const attAlias:XML = elementValue.attribute("class")[0];
             var valueMapper:AStreamMapper;
             if (attAlias) {
-                valueMapper = registry.getMapperForName(String(attAlias));
+                valueMapper = registry.getMapper(String(attAlias));
             } else {
-                valueMapper = registry.getMapperForClass(property.type);
+                valueMapper = registry.getMapper(property.type);
             }
             value = valueMapper.fromXML(elementValue, deref);
         }
@@ -212,19 +194,18 @@ class ImplicitCollectionHandler implements PropertyHandler {
 
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        const itemMapper:AStreamMapper = registry.getMapperForClass(itemType);
+        const itemMapper:AStreamMapper = registry.getMapper(itemType);
         TypeUtil.forEachInCollection(value,
                 function (item:Object, i:int, collection:Object):void {
-                    const result:XML = <{itemName}/>;
-                    itemMapper.fillXML(item, result, ref);
+                    const result:XML = itemMapper.toXML(item, ref, itemName);
                     parentXML.appendChild(result);
                 }
         );
     }
 
-    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamDeref):void {
+    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         var result:Object;
-        const itemMapper:AStreamMapper = registry.getMapperForClass(itemType);
+        const itemMapper:AStreamMapper = registry.getMapper(itemType);
         const items:Array = new Array();
         for each (var itemXML:XML in parentXML.elements(itemName)) {
             var item:Object = itemMapper.fromXML(itemXML, deref);

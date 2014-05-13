@@ -2,51 +2,29 @@ package ru.kokorin.astream.mapper {
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.ref.AStreamDeref;
+import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
-public class SequenceMapper implements AStreamMapper {
-    private var classInfo:ClassInfo;
-    private var registry:AStreamRegistry;
-
+public class SequenceMapper extends BaseMapper {
     public function SequenceMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
-        this.classInfo = classInfo;
-        this.registry = registry;
+        super(classInfo, registry);
     }
 
-    public function toXML(instance:Object, ref:AStreamRef):XML {
-        const name:String = registry.getAlias(classInfo);
-        const result:XML = <{name}/>;
-        fillXML(instance, result, ref);
-        return result;
-    }
-
-    public function fromXML(xml:XML, deref:AStreamDeref):Object {
-        const attRef:XML = xml.attribute("reference")[0];
-        if (attRef) {
-            return deref.getValue(String(attRef), xml);
-        }
-        const result:Object = classInfo.newInstance([]);
-        deref.addRef(result, xml);
+    override protected function fillObject(instance:Object, xml:XML, deref:AStreamRef):void {
+        super.fillObject(instance, xml, deref);
         const sequence:Array = new Array();
         for each (var elementItemValue:XML in xml.children()) {
-            var itemValueMapper:AStreamMapper = registry.getMapperForName(elementItemValue.name());
+            var itemValueMapper:AStreamMapper = registry.getMapper(elementItemValue.localName());
             var itemValue:Object = itemValueMapper.fromXML(elementItemValue, deref);
             sequence.push(itemValue);
         }
-        setSequence(result, sequence);
-        return result;
+        setSequence(instance, sequence);
     }
 
-    public function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
-        if (ref.hasRef(instance)) {
-            xml.attribute("reference")[0] = String(ref.getRef(instance, xml));
-            return;
-        }
-        ref.addValue(instance, xml);
+    override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
+        super.fillXML(instance, xml, ref);
         const sequence:Object = getSequence(instance);
-
         //Use forEachInCollection() loop wrapper because ArrayList doesn't support for each() loop
         TypeUtil.forEachInCollection(sequence,
                 function (itemValue:Object, i:int, collection:Object):void {
@@ -54,14 +32,9 @@ public class SequenceMapper implements AStreamMapper {
                     if (itemValue != null) {
                         itemValueType = ClassInfo.forInstance(itemValue);
                     }
-                    /* We have to add child tag to XML and only then fil that tag.
-                    * Otherwise relative XPath cannot be constructed properly. */
-                    const itemValueMapper:AStreamMapper = registry.getMapperForClass(itemValueType);
-                    const itemName:String = registry.getAlias(itemValueType);
-                    const itemResult:XML = <{itemName}/>;
+                    const itemValueMapper:AStreamMapper = registry.getMapper(itemValueType);
+                    const itemResult:XML = itemValueMapper.toXML(itemValue, ref);
                     xml.appendChild(itemResult);
-
-                    itemValueMapper.fillXML(itemValue, itemResult, ref);
                 }
         );
     }

@@ -4,9 +4,7 @@ import org.flexunit.asserts.assertNotNull;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
-import ru.kokorin.astream.ref.NoDeref;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.valueobject.EnumVO;
 import ru.kokorin.astream.valueobject.ExtVO;
@@ -14,7 +12,6 @@ import ru.kokorin.astream.valueobject.ExtVO;
 public class ExternalizableMapperTest {
     private const registry:AStreamRegistry = new AStreamRegistry();
     private const noRef:AStreamRef = new NoRef();
-    private const noDeref:AStreamDeref = new NoDeref();
 
     [Test]
     public function test():void {
@@ -27,7 +24,7 @@ public class ExternalizableMapperTest {
 
         const complexMapper:ExternalizableMapper = new ExternalizableMapper(ClassInfo.forClass(ExtVO), registry);
         const xml:XML = complexMapper.toXML(original, noRef);
-        const restored:ExtVO = complexMapper.fromXML(xml, noDeref) as ExtVO;
+        const restored:ExtVO = complexMapper.fromXML(xml, noRef) as ExtVO;
 
         assertNotNull("Restored complex object", restored);
         assertEquals("Restored complex object", original.describe(), restored.describe());

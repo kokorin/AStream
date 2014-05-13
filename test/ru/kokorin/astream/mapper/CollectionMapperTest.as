@@ -8,9 +8,7 @@ import org.hamcrest.collection.array;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
-import ru.kokorin.astream.ref.NoDeref;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.util.TypeUtil;
 import ru.kokorin.astream.valueobject.EnumVO;
@@ -30,7 +28,6 @@ public class CollectionMapperTest {
 
     private const registry:AStreamRegistry = new AStreamRegistry();
     private const noRef:AStreamRef = new NoRef();
-    private const noDeref:AStreamDeref = new NoDeref();
 
     [Test(dataProvider="TYPE_VALUES_PAIRS")]
     public function test(type:Class, items:Array):void {
@@ -40,7 +37,7 @@ public class CollectionMapperTest {
         const collectionMapper:CollectionMapper = new CollectionMapper(info, registry);
 
         const xml:XML = collectionMapper.toXML(values, noRef);
-        const restored:Object = collectionMapper.fromXML(xml, noDeref);
+        const restored:Object = collectionMapper.fromXML(xml, noRef);
         const restoredItems:Array = new Array();
         TypeUtil.forEachInCollection(restored,
                 function (item:Object, i:int, collection:Object):void {

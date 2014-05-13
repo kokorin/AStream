@@ -2,20 +2,11 @@ package ru.kokorin.astream {
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.mapper.AStreamMapper;
-import ru.kokorin.astream.ref.AStreamDeref;
 import ru.kokorin.astream.ref.AStreamRef;
-import ru.kokorin.astream.ref.IdDeref;
-import ru.kokorin.astream.ref.IdRef;
-import ru.kokorin.astream.ref.NoDeref;
-import ru.kokorin.astream.ref.NoRef;
-import ru.kokorin.astream.ref.XPathAbsoluteDeref;
-import ru.kokorin.astream.ref.XPathAbsoluteRef;
-import ru.kokorin.astream.ref.XPathRelativeDeref;
-import ru.kokorin.astream.ref.XPathRelativeRef;
+import ru.kokorin.astream.ref.XPathRef;
 
 public class AStream {
     private var ref:AStreamRef;
-    private var deref:AStreamDeref;
     private const registry:AStreamRegistry = new AStreamRegistry();
 
     public function AStream() {
@@ -24,35 +15,23 @@ public class AStream {
 
     public function set mode(value:AStreamMode):void {
         switch (value) {
-            case AStreamMode.NO_REFERENCES: {
-                ref = new NoRef();
-                deref = new NoDeref();
-                break;
-            }
-            case AStreamMode.ID_REFERENCES: {
-                ref = new IdRef();
-                deref = new IdDeref();
-                break;
-            }
+            case AStreamMode.NO_REFERENCES:
+            case AStreamMode.ID_REFERENCES:
             case AStreamMode.SINGLE_NODE_XPATH_ABSOLUTE_REFERENCES: {
-                ref = new XPathAbsoluteRef(true);
-                deref = new XPathAbsoluteDeref(true);
+                ref = new XPathRef(true, false);
                 break;
             }
             case AStreamMode.SINGLE_NODE_XPATH_RELATIVE_REFERENCES:{
-                ref = new XPathRelativeRef(true);
-                deref = new XPathRelativeDeref(true);
+                ref = new XPathRef(true, true);
                 break;
             }
             case AStreamMode.XPATH_ABSOLUTE_REFERENCES: {
-                ref = new XPathAbsoluteRef(false);
-                deref = new XPathAbsoluteDeref(false);
+                ref = new XPathRef(false, false);
                 break;
             }
             case AStreamMode.XPATH_RELATIVE_REFERENCES:
             default: {
-                ref = new XPathRelativeRef(false);
-                deref = new XPathRelativeDeref(false);
+                ref = new XPathRef(false, true);
                 break;
             }
         }
@@ -89,19 +68,19 @@ public class AStream {
 
     public function toXML(object:Object):XML {
         var classInfo:ClassInfo = null;
-        if (object != null && !isNaN(object as Number)) {
+        if (object != null) {
             classInfo = ClassInfo.forInstance(object);
         }
-        const mapper:AStreamMapper = registry.getMapperForClass(classInfo);
+        const mapper:AStreamMapper = registry.getMapper(classInfo);
         const result:XML = mapper.toXML(object, ref);
         ref.clear();
         return result;
     }
 
     public function fromXML(xml:XML):Object {
-        const mapper:AStreamMapper = registry.getMapperForName(xml.name());
-        const result:Object = mapper.fromXML(xml, deref);
-        deref.clear();
+        const mapper:AStreamMapper = registry.getMapper(xml.localName());
+        const result:Object = mapper.fromXML(xml, ref);
+        ref.clear();
         return result;
     }
 }

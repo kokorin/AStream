@@ -9,12 +9,12 @@ import ru.kokorin.astream.util.TypeUtil;
 public class AStreamRegistry {
     private var _autodetectMetadata:Boolean = false;
     private var metadataProcessor:AStreamMetadataProcessor;
-    private const mapperMap:Map = new Map();
+
     private const packageByAliasMap:Map = new Map();
     private const aliasByPackageMap:Map = new Map();
     private const classDataMap:Map = new Map();
     private const classByAliasMap:Map = new Map();
-    private const converterMap:Map = new Map();
+
     private const mapperFactory:AStreamMapperFactory = new AStreamMapperFactory();
     private const converterFactory:AStreamConverterFactory = new AStreamConverterFactory();
 
@@ -23,15 +23,6 @@ public class AStreamRegistry {
     public function AStreamRegistry() {
         alias("null", null);
         metadataProcessor = new AStreamMetadataProcessor(this);
-    }
-
-    public function getConverter(classInfo:ClassInfo):AStreamConverter {
-        if (converterMap.containsKey(classInfo)) {
-            return converterMap.get(classInfo) as AStreamConverter;
-        }
-        const converter:AStreamConverter = converterFactory.createConverter(classInfo);
-        converterMap.put(classInfo, converter);
-        return converter;
     }
 
     public function autodetectMetadata(value:Boolean):void {
@@ -43,20 +34,32 @@ public class AStreamRegistry {
         autodetectMetadata(false);
     }
 
-    public function getMapperForClass(classInfo:ClassInfo):AStreamMapper {
-        var mapper:AStreamMapper = mapperMap.get(classInfo);
-        if (!mapper) {
+    public function getConverter(classInfo:ClassInfo):AStreamConverter {
+        const classData:ClassData = getClassData(classInfo);
+        if (!classData.converter) {
+            classData.converter = converterFactory.createConverter(classInfo);
+        }
+        return classData.converter;
+    }
+
+    public function getMapper(nameOrClass:Object):AStreamMapper {
+        var classInfo:ClassInfo = nameOrClass as ClassInfo;
+        if (!classInfo) {
+            if (nameOrClass is String) {
+                classInfo = getClass(nameOrClass as String);
+            } else if (nameOrClass is Class) {
+                classInfo = ClassInfo.forClass(nameOrClass as Class);
+            }
+        }
+
+        const classData:ClassData = getClassData(classInfo);
+        if (!classData.mapper) {
             if (_autodetectMetadata) {
                 metadataProcessor.processMetadata(classInfo);
             }
-            mapper = mapperFactory.createMapper(classInfo, this);
-            mapperMap.put(classInfo, mapper);
+            classData.mapper = mapperFactory.createMapper(classInfo, this);
         }
-        return mapper;
-    }
-
-    public function getMapperForName(name:String):AStreamMapper {
-        return getMapperForClass(getClass(name));
+        return classData.mapper;
     }
 
     public function aliasPackage(name:String, pckg:String):void {
@@ -214,8 +217,14 @@ public class AStreamRegistry {
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
+import ru.kokorin.astream.converter.AStreamConverter;
+
+import ru.kokorin.astream.mapper.AStreamMapper;
+
 class ClassData {
     public var alias:String;
+    public var mapper:AStreamMapper;
+    public var converter:AStreamConverter;
     private const propertyDataMap:Map = new Map();
 
     public function getPropertyData(propertyName:String):PropertyData {

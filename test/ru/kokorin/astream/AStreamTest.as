@@ -1,4 +1,6 @@
 package ru.kokorin.astream {
+import flash.utils.ByteArray;
+
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
@@ -49,6 +51,20 @@ public class AStreamTest {
         assertFalse("0.5 is not int", 0.5 is int);
     }
 
+    public static var TEXT_ENCODED_PAIRS:Array = [
+        ["The quick brown fox jumps over the lazy dog", "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="]
+    ];
+    [Test(dataProvider="TEXT_ENCODED_PAIRS")]
+    public function testByteArray(text:String, encoded:String):void {
+        const bytes:ByteArray = new ByteArray();
+        bytes.writeUTFBytes(text);
+        const xml:XML = aStream.toXML(bytes);
+        const restored:ByteArray = aStream.fromXML(xml) as ByteArray;
+
+        assertEquals("Wrong Base64 encoding", String(xml), encoded);
+        assertNotNull("Failed to restore ByteArray", restored);
+        assertEquals("Wrong Base64 decoding", String(restored), text);
+    }
 
     [Test]
     public function testAttribute():void {
@@ -62,6 +78,7 @@ public class AStreamTest {
         const restored:TestVO = aStream.fromXML(xml) as TestVO;
 
         assertNotNull("Restored object from XML", restored);
+        assertEquals("xml/@value1", String(original.name), String(xml.attribute("name")));
         assertEquals("xml/@value1", String(original.value1), String(xml.attribute("value1")));
         assertEquals("xml/@value2", String(original.value2), String(xml.attribute("value2")));
         assertEquals("xml/@value3", String(original.value3), String(xml.attribute("value3")));
@@ -106,6 +123,7 @@ public class AStreamTest {
         assertThat("Restored children length", restored.children, arrayWithSize(original.children.length));
     }
 
+    [Ignore]
     [Test(expects="Error")]
     public function testCircularReferenceError():void {
         const original:TestVO = new TestVO("Root");
