@@ -20,6 +20,7 @@ public class ComplexMapper extends BaseMapper {
         }
         const unorderedProperties:Array = classInfo.getProperties();
         const orderedProperties:Array = unorderedProperties.concat().sort(compareProperties);
+        const implicitCollectionItemNames:Array = new Array();
         for each (var property:Property in orderedProperties) {
             //If property cannot be properly mapped it should be omitted
             if (registry.getOmit(classInfo, property.name) ||
@@ -42,10 +43,14 @@ public class ComplexMapper extends BaseMapper {
                     itemType = TypeUtil.getVectorItemType(property.type);
                 }
                 if (itemName != null && itemName != "" && itemType != null) {
+                    if (implicitCollectionItemNames.indexOf(itemName) != -1) {
+                        throw Error("Implicit collections cannot have the same item name");
+                    }
                     propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
+                    implicitCollectionItemNames.push(itemName);
                 }
             }
-            // Fall back to ChildElementHandler
+            // Use ChildElementHandler by default
             if (propertyHandler == null) {
                 propertyHandler = new ChildElementHandler(property, propertyAlias, registry);
             }
@@ -195,6 +200,9 @@ class ImplicitCollectionHandler implements PropertyHandler {
         const itemMapper:AStreamMapper = registry.getMapper(itemType);
         TypeUtil.forEachInCollection(value,
                 function (item:Object, i:int, collection:Object):void {
+                    if (item == null) {
+                        throw Error("Null items cannot be mapped in implicit collection");
+                    }
                     const result:XML = itemMapper.toXML(item, ref, itemName);
                     parentXML.appendChild(result);
                 }

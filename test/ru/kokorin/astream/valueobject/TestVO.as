@@ -10,6 +10,7 @@ public class TestVO {
     public var value4:Object;
     public var checked:Boolean;
     public var children:Array;
+    public var friends:Array;
 
     public function TestVO(name:String = null) {
         this.name = name;
@@ -20,14 +21,30 @@ public class TestVO {
     }
 
     public function describe():String {
-        return getQualifiedClassName(this) + "{name=" + String(name) +
-                ",enum=" + String(enum) +
-                ",value1=" + String(value1) +
-                ",value2=" + String(value2) +
-                ",value3=" + String(value3) +
-                ",value4=" + String(value4) +
-                ",checked=" + String(checked) +
-                ",children=" + String(children) + "}";
+        const result:Array = [name];
+        if (enum != null) {
+            result.push("enum="+enum);
+        }
+        if (!isNaN(value1)) {
+            result.push("value1="+value1);
+        }
+        if (enum != null) {
+            result.push("enum="+enum);
+        }
+        result.push("value2="+value2);
+        result.push("value3="+value3);
+        if (value4 != null) {
+            result.push("value4="+value4);
+        }
+        result.push("checked="+checked);
+        if (children != null) {
+            result.push("children="+children);
+        }
+        if (friends != null) {
+            result.push("friends="+friends);
+        }
+        const clazzName:String = getQualifiedClassName(this).split(".").reverse()[0];
+        return clazzName + "{" + result.join(", ") + "}";
     }
 }
 }

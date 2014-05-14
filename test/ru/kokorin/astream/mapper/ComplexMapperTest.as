@@ -12,12 +12,15 @@ import ru.kokorin.astream.valueobject.TestVO;
 public class ComplexMapperTest {
     private var registry:AStreamRegistry;
     private var noRef:AStreamRef;
+    private var complexMapper:ComplexMapper;
     private var original:TestVO;
+    private static const TEST_VO:ClassInfo = ClassInfo.forClass(TestVO);
 
     [Before]
     public function setUp():void {
         registry = new AStreamRegistry();
         noRef = new NoRef();
+        complexMapper = new ComplexMapper(TEST_VO, registry);
 
         original = new TestVO("Root");
         original.enum = EnumVO.SECOND;
@@ -29,7 +32,6 @@ public class ComplexMapperTest {
 
     [Test]
     public function test():void {
-        const complexMapper:ComplexMapper = new ComplexMapper(ClassInfo.forClass(TestVO), registry);
         const xml:XML = complexMapper.toXML(original, noRef);
         const restored:TestVO = complexMapper.fromXML(xml, noRef) as TestVO;
 
@@ -37,20 +39,20 @@ public class ComplexMapperTest {
         assertEquals("Restored complex object", original.describe(), restored.describe());
     }
 
-    [Ignore(description="Null item in implicit collection causes this test to fail")]
-    [Test]
-    public function testImplicitCollection():void {
-        const testInfo:ClassInfo = ClassInfo.forClass(TestVO)
-        registry.implicitCollection(testInfo, "children", "child", testInfo);
-        original.children = [new TestVO("First"), null, new TestVO("Third")]
-        const complexMapper:ComplexMapper = new ComplexMapper(testInfo, registry);
+    [Test(expects="Error")]
+    public function testNullInImplicitCollection():void {
+        registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
+        original.children = [new TestVO("First"), null, new TestVO("Third")];
 
-        const xml:XML = complexMapper.toXML(original, noRef);
-        const restored:TestVO = complexMapper.fromXML(xml, noRef) as TestVO;
+        complexMapper.toXML(original, noRef);
+    }
 
-        assertNotNull("Restored complex object", restored);
-        assertEquals("Xml/child", original.children.length, xml.elements("child").length());
-        assertEquals("Restored complex object", original.describe(), restored.describe());
+    [Test(expects="Error")]
+    public function testItemNameCoincidenceInImplicitCollection():void {
+        registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
+        registry.implicitCollection(TEST_VO, "friends", "child", TEST_VO);
+
+        complexMapper.toXML(original, noRef);
     }
 }
 }
