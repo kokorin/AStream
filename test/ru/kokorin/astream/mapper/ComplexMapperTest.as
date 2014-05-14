@@ -48,9 +48,18 @@ public class ComplexMapperTest {
     }
 
     [Test(expects="Error")]
-    public function testItemNameCoincidenceInImplicitCollection():void {
+    public function testAmbiguousAttributes():void {
+        registry.attribute(TEST_VO, "value1");
+        registry.attribute(TEST_VO, "value2");
+        registry.aliasProperty("value1", TEST_VO, "value2");
+
+        complexMapper.toXML(original, noRef);
+    }
+
+    [Test(expects="Error")]
+    public function testAmbiguousElements():void {
+        registry.aliasProperty("child", TEST_VO, "value1");
         registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
-        registry.implicitCollection(TEST_VO, "friends", "child", TEST_VO);
 
         complexMapper.toXML(original, noRef);
     }

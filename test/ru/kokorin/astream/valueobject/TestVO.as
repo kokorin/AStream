@@ -10,7 +10,6 @@ public class TestVO {
     public var value4:Object;
     public var checked:Boolean;
     public var children:Array;
-    public var friends:Array;
 
     public function TestVO(name:String = null) {
         this.name = name;
@@ -39,9 +38,6 @@ public class TestVO {
         result.push("checked="+checked);
         if (children != null) {
             result.push("children="+children);
-        }
-        if (friends != null) {
-            result.push("friends="+friends);
         }
         const clazzName:String = getQualifiedClassName(this).split(".").reverse()[0];
         return clazzName + "{" + result.join(", ") + "}";

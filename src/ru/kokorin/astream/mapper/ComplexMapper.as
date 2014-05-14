@@ -8,7 +8,7 @@ import ru.kokorin.astream.util.TypeUtil;
 
 public class ComplexMapper extends BaseMapper {
     private var processed:Boolean = false;
-    private const handlers:Array = new Array();
+    private var handlers:Array = new Array();
 
     public function ComplexMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
         super(classInfo, registry);
@@ -18,9 +18,13 @@ public class ComplexMapper extends BaseMapper {
         if (processed) {
             return;
         }
+        //Set this.handlers after all properties handled in case of exception
+        const result:Array = new Array();
         const unorderedProperties:Array = classInfo.getProperties();
         const orderedProperties:Array = unorderedProperties.concat().sort(compareProperties);
-        const implicitCollectionItemNames:Array = new Array();
+        const attributeNames:Array = new Array();
+        const elementNames:Array = new Array();
+
         for each (var property:Property in orderedProperties) {
             //If property cannot be properly mapped it should be omitted
             if (registry.getOmit(classInfo, property.name) ||
@@ -33,8 +37,11 @@ public class ComplexMapper extends BaseMapper {
             var propertyAlias:String = registry.getAliasProperty(classInfo, property.name);
             var asAttribute:Boolean = registry.getAttribute(classInfo, property.name);
             var asImplicitCollection:Boolean = registry.getImplicitCollection(classInfo, property.name);
+            var attributeName:String = null;
+            var elementName:String = null;
 
             if (asAttribute && TypeUtil.isSimple(property.type)) {
+                attributeName = propertyAlias;
                 propertyHandler = new AttributeHandler(property, propertyAlias, registry);
             } else if (asImplicitCollection && TypeUtil.isCollection(property.type)) {
                 var itemName:String = registry.getImplicitItemName(classInfo, property.name);
@@ -43,20 +50,21 @@ public class ComplexMapper extends BaseMapper {
                     itemType = TypeUtil.getVectorItemType(property.type);
                 }
                 if (itemName != null && itemName != "" && itemType != null) {
-                    if (implicitCollectionItemNames.indexOf(itemName) != -1) {
-                        throw Error("Implicit collections cannot have the same item name");
-                    }
+                    elementName = itemName;
                     propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
-                    implicitCollectionItemNames.push(itemName);
                 }
             }
             // Use ChildElementHandler by default
             if (propertyHandler == null) {
+                elementName = propertyAlias;
                 propertyHandler = new ChildElementHandler(property, propertyAlias, registry);
             }
-            handlers.push(propertyHandler);
+            checkAmbiguousNames(attributeNames, attributeName);
+            checkAmbiguousNames(elementNames, elementName);
+            result.push(propertyHandler);
         }
         processed = true;
+        handlers = result;
     }
 
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
@@ -77,7 +85,7 @@ public class ComplexMapper extends BaseMapper {
 
     override public function reset():void {
         super.reset();
-        handlers.splice(0);
+        handlers = null;
         processed = false;
     }
 
@@ -91,6 +99,15 @@ public class ComplexMapper extends BaseMapper {
             return 1;
         }
         return -1;
+    }
+
+    private static function checkAmbiguousNames(names:Array, name:String):void {
+        if (name) {
+            if (names.indexOf(name) != -1) {
+                throw Error("Ambiguous node name: " + name);
+            }
+            names.push(name);
+        }
     }
 }
 }
