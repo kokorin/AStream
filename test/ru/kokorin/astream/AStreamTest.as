@@ -1,6 +1,4 @@
 package ru.kokorin.astream {
-import flash.utils.ByteArray;
-
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertFalse;
@@ -49,21 +47,6 @@ public class AStreamTest {
         assertTrue("0.5 is Number", 0.5 is Number);
         assertTrue("Class(0.5) is not int", info05 != infoInt);
         assertFalse("0.5 is not int", 0.5 is int);
-    }
-
-    public static var TEXT_ENCODED_PAIRS:Array = [
-        ["The quick brown fox jumps over the lazy dog", "VGhlIHF1aWNrIGJyb3duIGZveCBqdW1wcyBvdmVyIHRoZSBsYXp5IGRvZw=="]
-    ];
-    [Test(dataProvider="TEXT_ENCODED_PAIRS")]
-    public function testByteArray(text:String, encoded:String):void {
-        const bytes:ByteArray = new ByteArray();
-        bytes.writeUTFBytes(text);
-        const xml:XML = aStream.toXML(bytes);
-        const restored:ByteArray = aStream.fromXML(xml) as ByteArray;
-
-        assertEquals("Wrong Base64 encoding", String(xml), encoded);
-        assertNotNull("Failed to restore ByteArray", restored);
-        assertEquals("Wrong Base64 decoding", String(restored), text);
     }
 
     [Test]

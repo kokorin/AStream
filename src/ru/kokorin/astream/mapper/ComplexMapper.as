@@ -14,7 +14,7 @@ public class ComplexMapper extends BaseMapper {
         super(classInfo, registry);
     }
 
-    public function process():void {
+    private function process():void {
         if (processed) {
             return;
         }

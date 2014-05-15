@@ -1,6 +1,9 @@
 package ru.kokorin.astream.mapper {
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
+import org.flexunit.asserts.assertNull;
+import org.flexunit.asserts.assertStrictlyEquals;
+import org.flexunit.asserts.assertTrue;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
@@ -62,6 +65,26 @@ public class ComplexMapperTest {
         registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
 
         complexMapper.toXML(original, noRef);
+    }
+
+
+    [Test]
+    public function testReset():void {
+        original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")];
+        const xmlBeforeAlias:XML = complexMapper.toXML(original, noRef);
+        noRef.clear();
+
+        registry.alias("test", TEST_VO);
+        registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
+        const xmlAfterAlias:XML = complexMapper.toXML(original, noRef);
+        noRef.clear();
+
+        complexMapper.reset();
+        const xmlAfterReset:XML = complexMapper.toXML(original, noRef);
+
+        assertEquals("Before alias and after", xmlBeforeAlias.toXMLString(), xmlAfterAlias.toXMLString());
+        assertTrue("After alias still NO 'child' property", xmlAfterAlias.elements("child")[0] === undefined);
+        assertTrue("After reset we do have 'child' property", xmlAfterReset.elements("child")[0] !== undefined);
     }
 }
 }

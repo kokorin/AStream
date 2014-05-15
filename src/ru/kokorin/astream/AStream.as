@@ -8,6 +8,7 @@ import ru.kokorin.astream.ref.XPathRef;
 
 public class AStream {
     private var ref:AStreamRef;
+    private var needReset:Boolean = false;
     private const registry:AStreamRegistry = new AStreamRegistry();
 
     public function AStream() {
@@ -44,26 +45,32 @@ public class AStream {
     public function processMetadata(clazz:Class):void {
         const classInfo:ClassInfo = ClassInfo.forClass(clazz);
         registry.processMetadata(classInfo);
+        needReset = true;
     }
 
     public function alias(name:String, clazz:Class):void {
         registry.alias(name, ClassInfo.forClass(clazz));
+        needReset = true;
     }
 
     public function aliasProperty(name:String, clazz:Class, propertyName:String):void {
         registry.aliasProperty(name, ClassInfo.forClass(clazz), propertyName);
+        needReset = true;
     }
 
     public function useAttributeFor(clazz:Class, propertyName:String):void {
         registry.attribute(ClassInfo.forClass(clazz), propertyName);
+        needReset = true;
     }
 
     public function aliasPackage(name:String, pckg:String):void {
         registry.aliasPackage(name, pckg);
+        needReset = true;
     }
 
     public function implicitCollection(clazz:Class, propertyName:String, itemName:String, itemClazz:Class):void {
         registry.implicitCollection(ClassInfo.forClass(clazz), propertyName, itemName, ClassInfo.forClass(itemClazz));
+        needReset = true;
     }
 
     public function autodetectMetadata(value:Boolean):void {
@@ -71,21 +78,37 @@ public class AStream {
     }
 
     public function toXML(object:Object):XML {
+        reset();
         var classInfo:ClassInfo = null;
         if (object != null) {
             classInfo = ClassInfo.forInstance(object);
         }
         const mapper:AStreamMapper = registry.getMapper(classInfo);
-        const result:XML = mapper.toXML(object, ref);
-        ref.clear();
-        return result;
+        try {
+            return mapper.toXML(object, ref);
+        } finally {
+            ref.clear();
+        }
+        return null;
     }
 
     public function fromXML(xml:XML):Object {
+        reset();
         const mapper:AStreamMapper = registry.getMapper(xml.localName());
-        const result:Object = mapper.fromXML(xml, ref);
-        ref.clear();
-        return result;
+        try {
+            return mapper.fromXML(xml, ref);
+        } finally {
+            ref.clear();
+        }
+        return null;
+    }
+
+    private function reset():void {
+        if (!needReset) {
+            return;
+        }
+        registry.resetMappers();
+        needReset = false;
     }
 }
 }

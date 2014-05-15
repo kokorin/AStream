@@ -182,6 +182,14 @@ public class AStreamRegistry {
         return getClassData(classInfo).getPropertyData(propertyName).order;
     }
 
+    public function resetMappers():void {
+        for each (var data:ClassData in classDataMap.values) {
+            if (data.mapper != null) {
+                data.mapper.reset();
+            }
+        }
+    }
+
     private function getClassData(classInfo:ClassInfo):ClassData {
         var result:ClassData = classDataMap.get(classInfo);
         if (!result) {
