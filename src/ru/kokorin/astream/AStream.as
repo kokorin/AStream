@@ -1,8 +1,25 @@
+/*
+ * Copyright 2014 Kokorin Denis
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.kokorin.astream {
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.mapper.AStreamMapper;
 import ru.kokorin.astream.ref.AStreamRef;
+import ru.kokorin.astream.ref.IdRef;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.ref.XPathRef;
 
@@ -21,7 +38,10 @@ public class AStream {
                 ref = new NoRef();
                 break;
             }
-            case AStreamMode.ID_REFERENCES:
+            case AStreamMode.ID_REFERENCES: {
+                ref = new IdRef();
+                break;
+            }
             case AStreamMode.SINGLE_NODE_XPATH_ABSOLUTE_REFERENCES: {
                 ref = new XPathRef(true, false);
                 break;
@@ -84,23 +104,25 @@ public class AStream {
             classInfo = ClassInfo.forInstance(object);
         }
         const mapper:AStreamMapper = registry.getMapper(classInfo);
+        var result:XML;
         try {
-            return mapper.toXML(object, ref);
+            result = mapper.toXML(object, ref);
         } finally {
             ref.clear();
         }
-        return null;
+        return result;
     }
 
     public function fromXML(xml:XML):Object {
         reset();
         const mapper:AStreamMapper = registry.getMapper(xml.localName());
+        var result:Object;
         try {
-            return mapper.fromXML(xml, ref);
+            result = mapper.fromXML(xml, ref);
         } finally {
             ref.clear();
         }
-        return null;
+        return result;
     }
 
     private function reset():void {

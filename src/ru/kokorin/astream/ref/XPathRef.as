@@ -1,3 +1,19 @@
+/*
+ * Copyright 2014 Kokorin Denis
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.kokorin.astream.ref {
 public class XPathRef extends BaseRef implements AStreamRef {
     private var relative:Boolean;
@@ -9,14 +25,17 @@ public class XPathRef extends BaseRef implements AStreamRef {
         clear();
     }
 
-    public function addValue(value:Object):void {
+    public function addValue(value:Object):Object {
         const pair:InstancePathPair = new InstancePathPair();
+        const xPath:Array = getCurrentXPath();
         pair.instance = value;
-        pair.xPath = getCurrentXPath();
+        pair.xPath = xPath;
         instanceXPathPairs.push(pair);
+        return xPathToString(xPath);
     }
 
-    public function getValue(ref:String):Object {
+    public function getValue(reference:Object):Object {
+        const ref:String = reference as String;
         if (ref) {
             const relativeXPath:Array = ref.split("/");
             const absoluteXPath:Array = getAbsoluteXPath(relativeXPath);
@@ -48,9 +67,9 @@ public class XPathRef extends BaseRef implements AStreamRef {
         return false;
     }
 
-    public function getRef(toValue:Object):String {
+    public function getRef(value:Object):Object {
         for each (var pair:InstancePathPair in instanceXPathPairs) {
-            if (pair.instance == toValue) {
+            if (pair.instance == value) {
                 var relativeXPath:Array = getRelativeXPath(pair.xPath);
                 return xPathToString(relativeXPath);
             }

@@ -1,8 +1,6 @@
 package ru.kokorin.astream.mapper {
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
-import org.flexunit.asserts.assertNull;
-import org.flexunit.asserts.assertStrictlyEquals;
 import org.flexunit.asserts.assertTrue;
 import org.spicefactory.lib.reflect.ClassInfo;
 
