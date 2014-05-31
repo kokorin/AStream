@@ -57,7 +57,7 @@ public class AStreamMetadataProcessor {
 
     private static const OBJECT_INFO:ClassInfo = ClassInfo.forClass(Object);
     public function processMetadata(classInfo:ClassInfo):void {
-        while (classInfo && classInfo != OBJECT_INFO) {
+        while (classInfo != null && classInfo != OBJECT_INFO) {
             if (TypeUtil.isCollection(classInfo)) {
                 if (TypeUtil.isVector(classInfo)) {
                     processMetadata(TypeUtil.getVectorItemType(classInfo));
@@ -67,7 +67,7 @@ public class AStreamMetadataProcessor {
             if (TypeUtil.isSimple(classInfo) || processedClasses.indexOf(classInfo) != -1) {
                 break;
             }
-            var alias:String = getAlias(classInfo);
+            const alias:String = getAlias(classInfo);
             if (alias) {
                 registry.alias(alias, classInfo);
             }
@@ -99,17 +99,17 @@ public class AStreamMetadataProcessor {
                         collectionItemType = TypeUtil.getVectorItemType(property.type);
                     }
                 }
-                if (collectionItemType) {
+                if (collectionItemType != null) {
                     processMetadata(collectionItemType);
                 }
 
                 var implicitMeta:AStreamImplicit = getMetadata(property, AStreamImplicit) as AStreamImplicit;
-                if (implicitMeta) {
+                if (implicitMeta != null) {
                     var implicitItemType:ClassInfo = null;
-                    if (implicitMeta.itemType) {
+                    if (implicitMeta.itemType != null) {
                         implicitItemType = ClassInfo.forName(implicitMeta.itemType);
                         processMetadata(implicitItemType);
-                    } else if (collectionItemType) {
+                    } else if (collectionItemType != null) {
                         implicitItemType = collectionItemType;
                     }
                     registry.implicitCollection(classInfo, property.name, implicitMeta.itemName, implicitItemType);

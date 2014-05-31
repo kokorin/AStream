@@ -17,7 +17,7 @@
 package ru.kokorin.astream.ref {
 public class BaseRef {
     private var forceSingleNode:Boolean;
-    protected const currentNodePath:Array = new Array();
+    private const currentNodePath:Array = new Array();
 
     public function BaseRef(forceSingleNode:Boolean = false) {
         this.forceSingleNode = forceSingleNode;
@@ -42,14 +42,16 @@ public class BaseRef {
 
     public function clear():void {
         currentNodePath.splice(0);
+        //first NodeData's path is always an empty string ("")
         currentNodePath.push(new NodeData("", 0));
     }
 
     protected function getCurrentXPath():Array {
-        var result:Array = new Array();
+        const result:Array = new Array();
         for (var i:int = 0; i < currentNodePath.length; i++) {
             var nodeData:NodeData = currentNodePath[i] as NodeData;
             var indexStr:String = "";
+            //first NodeData's path is always an empty string ("")
             if (i > 0 && (nodeData.index > 0 || forceSingleNode)) {
                 indexStr = "[" + (nodeData.index + 1) + "]";
             }

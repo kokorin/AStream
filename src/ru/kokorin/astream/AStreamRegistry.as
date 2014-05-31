@@ -52,7 +52,7 @@ public class AStreamRegistry {
 
     public function getConverter(classInfo:ClassInfo):AStreamConverter {
         const classData:ClassData = getClassData(classInfo);
-        if (!classData.converter) {
+        if (classData.converter == null) {
             classData.converter = converterFactory.createConverter(classInfo);
         }
         return classData.converter;
@@ -60,7 +60,7 @@ public class AStreamRegistry {
 
     public function getMapper(nameOrClass:Object):AStreamMapper {
         var classInfo:ClassInfo = nameOrClass as ClassInfo;
-        if (!classInfo) {
+        if (classInfo == null) {
             if (nameOrClass is String) {
                 classInfo = getClass(nameOrClass as String);
             } else if (nameOrClass is Class) {
@@ -69,7 +69,7 @@ public class AStreamRegistry {
         }
 
         const classData:ClassData = getClassData(classInfo);
-        if (!classData.mapper) {
+        if (classData.mapper == null) {
             if (_autodetectMetadata) {
                 metadataProcessor.processMetadata(classInfo);
             }
@@ -79,18 +79,18 @@ public class AStreamRegistry {
     }
 
     public function aliasPackage(name:String, pckg:String):void {
-        if (!name) {
+        if (name == null) {
             name = "";
         }
-        if (!pckg) {
+        if (pckg == null) {
             pckg = "";
         }
         const oldName:String = aliasByPackageMap.get(pckg);
         const oldPckg:String = packageByAliasMap.get(name);
-        if (oldName) {
+        if (oldName != null) {
             packageByAliasMap.remove(oldName);
         }
-        if (oldPckg) {
+        if (oldPckg != null) {
             aliasByPackageMap.remove(oldPckg);
         }
         aliasByPackageMap.put(pckg, name);
@@ -98,7 +98,7 @@ public class AStreamRegistry {
     }
     public function alias(name:String, classInfo:ClassInfo):void {
         const classData:ClassData = getClassData(classInfo);
-        if (classData.alias) {
+        if (classData.alias != null) {
             classByAliasMap.remove(classData.alias);
         }
         classData.alias = name;
@@ -106,7 +106,7 @@ public class AStreamRegistry {
     }
     public function getAlias(classInfo:ClassInfo):String {
         const alias:String = getClassData(classInfo).alias;
-        if (alias) {
+        if (alias != null) {
             return alias;
         }
 
@@ -144,7 +144,7 @@ public class AStreamRegistry {
         var pckg:String = nameOrAlias.substring(0, lastDotIndex);
         const name:String = nameOrAlias.substring(lastDotIndex+1);
         pckg = replaceByLongestMatch(pckg, packageByAliasMap);
-        if (pckg != null && pckg != "") {
+        if (pckg != null && pckg.length > 0) {
             return ClassInfo.forName(pckg + "::" + name);
         }
         return ClassInfo.forName(name);
@@ -155,7 +155,7 @@ public class AStreamRegistry {
     }
     public function getAliasProperty(classInfo:ClassInfo, propertyName:String):String {
         var result:String = getClassData(classInfo).getPropertyData(propertyName).alias;
-        if (!result) {
+        if (result == null) {
             result = propertyName;
         }
         return result;
@@ -208,7 +208,7 @@ public class AStreamRegistry {
 
     private function getClassData(classInfo:ClassInfo):ClassData {
         var result:ClassData = classDataMap.get(classInfo);
-        if (!result) {
+        if (result == null) {
             result = new ClassData();
             classDataMap.put(classInfo, result);
         }
@@ -252,7 +252,7 @@ class ClassData {
 
     public function getPropertyData(propertyName:String):PropertyData {
         var result:PropertyData = propertyDataMap.get(propertyName);
-        if (!result) {
+        if (result == null) {
             result = new PropertyData();
             propertyDataMap.put(propertyName, result);
         }

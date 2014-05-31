@@ -43,7 +43,7 @@ public class TypeUtil {
      *  Does not depend on IList.
      *  @param classInfo - type to check*/
     public static function isList(classInfo:ClassInfo):Boolean {
-        return ILIST_TYPE && classInfo.isType(ILIST_TYPE.getClass());
+        return ILIST_TYPE != null && classInfo.isType(ILIST_TYPE.getClass());
     }
 
     /** Checks if supplied type is Vector.
@@ -83,7 +83,7 @@ public class TypeUtil {
     }
 
     public static function addToCollection(collection:Object, items:Array):void {
-        if (!items || !items.length) {
+        if (collection == null || items == null || items.length == 0) {
             return;
         }
         const collectionInfo:ClassInfo = ClassInfo.forInstance(collection);

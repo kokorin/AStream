@@ -29,9 +29,9 @@ public class SequenceMapper extends BaseMapper {
     override protected function fillObject(instance:Object, xml:XML, deref:AStreamRef):void {
         super.fillObject(instance, xml, deref);
         const sequence:Array = new Array();
-        for each (var elementItemValue:XML in xml.children()) {
-            var itemValueMapper:AStreamMapper = registry.getMapper(elementItemValue.localName());
-            var itemValue:Object = itemValueMapper.fromXML(elementItemValue, deref);
+        for each (var itemXML:XML in xml.children()) {
+            var itemMapper:AStreamMapper = registry.getMapper(itemXML.localName());
+            var itemValue:Object = itemMapper.fromXML(itemXML, deref);
             sequence.push(itemValue);
         }
         setSequence(instance, sequence);

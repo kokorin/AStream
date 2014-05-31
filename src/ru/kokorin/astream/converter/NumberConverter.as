@@ -18,7 +18,7 @@ package ru.kokorin.astream.converter {
 
 public class NumberConverter implements AStreamConverter {
     public function fromString(string:String):Object {
-        if (string) {
+        if (string != null) {
             return parseFloat(string);
         }
         return 0;

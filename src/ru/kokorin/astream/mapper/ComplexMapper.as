@@ -62,10 +62,10 @@ public class ComplexMapper extends BaseMapper {
             } else if (asImplicitCollection && TypeUtil.isCollection(property.type)) {
                 var itemName:String = registry.getImplicitItemName(classInfo, property.name);
                 var itemType:ClassInfo = registry.getImplicitItemType(classInfo, property.name);
-                if (!itemType && TypeUtil.isVector(property.type)) {
+                if (itemType == null && TypeUtil.isVector(property.type)) {
                     itemType = TypeUtil.getVectorItemType(property.type);
                 }
-                if (itemName != null && itemName != "" && itemType != null) {
+                if (itemName != null && itemName.length > 0 && itemType != null) {
                     elementName = itemName;
                     propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
                 }
@@ -189,9 +189,8 @@ class ChildElementHandler implements PropertyHandler {
             const valueType:ClassInfo = ClassInfo.forInstance(value);
             const valueMapper:AStreamMapper = registry.getMapper(valueType);
             const result:XML = valueMapper.toXML(value, ref, name);
-            /* Integer numbers are always of type int, not Number!
-             * i.e. (10 is int) == true and (10.1 is Number) == true */
-            if (!TypeUtil.isSimple(property.type) && valueType != property.type) {
+            /* int is subtype of Number! We do not need class attribute in case of any numbers*/
+            if (!(value is Number) && valueType != property.type) {
                 result.attribute("class")[0] = registry.getAlias(valueType);
             }
             parentXML.appendChild(result);
@@ -204,7 +203,7 @@ class ChildElementHandler implements PropertyHandler {
         if (elementValue != null) {
             const attAlias:XML = elementValue.attribute("class")[0];
             var valueMapper:AStreamMapper;
-            if (attAlias) {
+            if (attAlias != null) {
                 valueMapper = registry.getMapper(String(attAlias));
             } else {
                 valueMapper = registry.getMapper(property.type);
@@ -251,7 +250,7 @@ class ImplicitCollectionHandler implements PropertyHandler {
             items.push(item);
         }
 
-        if (items.length) {
+        if (items.length > 0) {
             result = property.type.newInstance([]);
             TypeUtil.addToCollection(result, items);
         }

@@ -21,7 +21,7 @@ import flash.utils.ByteArray;
 
 public class ByteArrayConverter implements AStreamConverter {
     public function fromString(string:String):Object {
-        if (string && string != "") {
+        if (string != null && string.length > 0) {
             return Base64.decode(string);
         }
         return null;
@@ -29,7 +29,7 @@ public class ByteArrayConverter implements AStreamConverter {
 
     public function toString(value:Object):String {
         const bytes:ByteArray = value as ByteArray;
-        if (bytes) {
+        if (bytes != null) {
             return Base64.encode(bytes);
         }
         return "";

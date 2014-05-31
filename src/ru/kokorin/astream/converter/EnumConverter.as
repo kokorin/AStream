@@ -29,7 +29,7 @@ public class EnumConverter implements AStreamConverter {
 
     public function fromString(string:String):Object {
         const staticProperty:Property = classInfo.getStaticProperty(string);
-        if (staticProperty) {
+        if (staticProperty != null) {
             return staticProperty.getValue(null);
         }
         return null;
@@ -37,7 +37,7 @@ public class EnumConverter implements AStreamConverter {
 
     public function toString(value:Object):String {
         const enum:Enum = value as Enum;
-        if (enum) {
+        if (enum != null) {
             return enum.name;
         }
         return null;

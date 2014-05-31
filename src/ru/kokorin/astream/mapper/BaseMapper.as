@@ -37,13 +37,15 @@ public class BaseMapper implements AStreamMapper {
         }
         const result:XML = <{nodeName}/>;
 
-        ref.beginNode(nodeName);
-        if (ref.hasRef(instance)) {
-            result.attribute("reference")[0] = ref.getRef(instance);
-        } else if (instance!= null && classInfo != null) {
-            fillXML(instance, result, ref);
+        if (instance != null) {
+            ref.beginNode(nodeName);
+            if (ref.hasRef(instance)) {
+                result.attribute("reference")[0] = ref.getRef(instance);
+            } else if (classInfo != null) {
+                fillXML(instance, result, ref);
+            }
+            ref.endNode();
         }
-        ref.endNode();
 
         return result;
     }
@@ -51,15 +53,17 @@ public class BaseMapper implements AStreamMapper {
     public final function fromXML(xml:XML, ref:AStreamRef):Object {
         var result:Object = null;
 
-        ref.beginNode(xml.localName());
-        const attRef:XML = xml.attribute("reference")[0];
-        if (attRef) {
-            result = ref.getValue(String(attRef));
-        } else if (xml!= null && classInfo != null) {
-            result = classInfo.newInstance([]);
-            fillObject(result, xml, ref);
+        if (xml != null) {
+            ref.beginNode(xml.localName());
+            const attRef:XML = xml.attribute("reference")[0];
+            if (attRef != null) {
+                result = ref.getValue(String(attRef));
+            } else if (classInfo != null) {
+                result = classInfo.newInstance([]);
+                fillObject(result, xml, ref);
+            }
+            ref.endNode();
         }
-        ref.endNode();
 
         return result;
     }

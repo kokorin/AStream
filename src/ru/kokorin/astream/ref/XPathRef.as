@@ -36,7 +36,7 @@ public class XPathRef extends BaseRef implements AStreamRef {
 
     public function getValue(reference:Object):Object {
         const ref:String = reference as String;
-        if (ref) {
+        if (ref != null) {
             const relativeXPath:Array = ref.split("/");
             const absoluteXPath:Array = getAbsoluteXPath(relativeXPath);
             for each (var pair:InstancePathPair in instanceXPathPairs) {
