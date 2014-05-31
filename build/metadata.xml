@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<flex-config>
+	<compiler>
+		
+		<keep-as3-metadata append="true">
+			<name>AStreamAlias</name>
+			<name>AStreamAsAttribute</name>
+			<name>AStreamImplicit</name>
+			<name>AStreamOmitField</name>
+			<name>AStreamOrder</name>
+		</keep-as3-metadata>
+		
+	</compiler>
+</flex-config>

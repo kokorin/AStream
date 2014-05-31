@@ -1,0 +1,53 @@
+<project name="Spicelib Reflect" default="release"> 
+
+	
+	<property file="build.properties" />
+	
+	<property name="version" value="0.9.0"/>
+	<property name="project.dir" value="${basedir}/.."/>
+	<property name="release.target.dir" value="${project.dir}/release/${version}"/>
+
+	
+	<target name="release" description="Create Release Zip">
+			
+		<antcall target="clean"/>
+		<antcall target="compile"/>
+		<antcall target="copy"/>
+		<antcall target="zip"/>
+		
+	</target>
+	
+	<target name="clean">
+		<delete dir="${release.target.dir}"/>
+		<mkdir dir="${release.target.dir}"/>
+		<mkdir dir="${release.target.dir}/dependencies"/>
+	</target>
+	
+	<target name="compile">
+		<exec executable="${flex4.sdk}/bin/${compc}" dir="${basedir}">
+					
+			<arg line="-load-config=metadata.xml" />
+			<arg line="-load-config+=config.xml" />
+
+			<arg line="+release=${release.target.dir}/release" />
+			<arg line="+project=${project.dir}" />
+			<arg line="+version=${version}" />
+			
+		</exec>
+	</target>
+	
+	<target name="copy">
+		<copy todir="${release.target.dir}">
+			<fileset dir="${project.dir}" includes="LICENSE"/>
+		</copy>
+		<copy todir="${release.target.dir}/dependencies">
+			<fileset dir="${project.dir}/lib" includes="*.swc"/>
+		</copy>
+	</target>
+	
+	<target name="zip">
+		<zip basedir="${release.target.dir}" zipfile="${release.target.dir}/../astream-${version}.zip"/>
+	</target>
+
+	
+</project>

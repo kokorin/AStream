@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<flex-config>
+
+	<compiler>
+      
+		<source-path>
+      		<path-element>${project}/src</path-element>
+    	</source-path>
+		
+		<external-library-path>
+			<path-element>${flexlib}/libs/player/10.1/playerglobal.swc</path-element>
+			<path-element>${project}/lib/base64.swc</path-element>
+			<path-element>${project}/lib/spicelib-reflect-3.0.1.swc</path-element>
+			<path-element>${project}/lib/spicelib-util-3.0.0.swc</path-element>
+		</external-library-path>
+		
+		<warn-no-constructor>false</warn-no-constructor>
+	    <verbose-stacktraces>true</verbose-stacktraces>
+	    <debug>false</debug>
+	    
+	</compiler>
+	
+	<include-sources>
+  		<path-element>${project}/src</path-element>
+  	</include-sources>
+  	    
+  	<output>${release}/astream-${version}.swc</output>
+	    
+</flex-config>

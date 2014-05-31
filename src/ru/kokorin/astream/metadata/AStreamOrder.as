@@ -16,7 +16,7 @@
 
 package ru.kokorin.astream.metadata {
 
-[Metadata]
+[Metadata(name="AStreamOrder")]
 public class AStreamOrder {
     [DefaultProperty]
     public var order:int;
