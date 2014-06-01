@@ -36,7 +36,7 @@ public class AStreamConverterFactory {
                 return new BooleanConverter();
             } else if (classInfo.isType(Date)) {
                 return new DateConverter();
-            } else if (classInfo.isType(Number) || classInfo.isType(int) || classInfo.isType(uint)) {
+            } else if (classInfo.isType(Number)) {
                 return new NumberConverter();
             } else if (classInfo.isType(String)) {
                 return new StringConverter();

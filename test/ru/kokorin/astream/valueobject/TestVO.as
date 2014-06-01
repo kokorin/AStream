@@ -27,9 +27,6 @@ public class TestVO {
         if (!isNaN(value1)) {
             result.push("value1="+value1);
         }
-        if (enum != null) {
-            result.push("enum="+enum);
-        }
         result.push("value2="+value2);
         result.push("value3="+value3);
         if (value4 != null) {
