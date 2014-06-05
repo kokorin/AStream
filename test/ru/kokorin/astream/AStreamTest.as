@@ -1,4 +1,6 @@
 package ru.kokorin.astream {
+import flash.utils.Dictionary;
+
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
@@ -6,6 +8,8 @@ import org.flexunit.asserts.assertNull;
 import org.flexunit.asserts.assertTrue;
 import org.hamcrest.collection.arrayWithSize;
 import org.spicefactory.lib.reflect.ClassInfo;
+
+import ru.kokorin.astream.valueobject.EnumVO;
 
 import ru.kokorin.astream.valueobject.TestVO;
 
@@ -98,6 +102,25 @@ public class AStreamTest {
         assertNotNull("Restored object from XML", restored);
         assertEquals("Restored.value4 equals Restored.children", restored.value4, restored.children);
         assertThat("Restored children length", restored.children, arrayWithSize(original.children.length));
+    }
+
+    [Test(dataProvider="REFERENCE_MODES")]
+    public function testMapReference(mode:AStreamMode):void {
+        const original:TestVO = new TestVO("Root");
+        original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")];
+        original.value4 = new Dictionary();
+        original.value4[EnumVO.FIRST] = original.children[0];
+        original.value4[EnumVO.SECOND] = original.children[1];
+        original.value4[EnumVO.THIRD] = original.children[2];
+
+        aStream.mode = mode;
+        const xml:XML = aStream.toXML(original);
+        const restored:TestVO = aStream.fromXML(xml) as TestVO;
+
+        assertNotNull("Restored object from XML", restored);
+        assertEquals(restored.value4[EnumVO.FIRST], restored.children[0]);
+        assertEquals(restored.value4[EnumVO.SECOND], restored.children[1]);
+        assertEquals(restored.value4[EnumVO.THIRD], restored.children[2]);
     }
 
     [Test(expects="Error")]

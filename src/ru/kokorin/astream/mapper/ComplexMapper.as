@@ -121,10 +121,7 @@ public class ComplexMapper extends BaseMapper {
     private function compareProperties(prop1:Property, prop2:Property):int {
         const order1:int = registry.getOrder(classInfo, prop1.name);
         const order2:int = registry.getOrder(classInfo, prop2.name);
-        if (order1 == order2 ) {
-            return 0;
-        }
-        if (order1 > order2) {
+        if (order1 > order2 || (order1 == order2 && prop1.name > prop2.name)) {
             return 1;
         }
         return -1;
