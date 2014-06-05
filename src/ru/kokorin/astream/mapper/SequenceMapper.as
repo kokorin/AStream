@@ -29,7 +29,7 @@ public class SequenceMapper extends BaseMapper {
     override protected function fillObject(instance:Object, xml:XML, deref:AStreamRef):void {
         super.fillObject(instance, xml, deref);
         const sequence:Array = new Array();
-        for each (var itemXML:XML in xml.children()) {
+        for each (var itemXML:XML in xml.elements()) {
             var itemMapper:AStreamMapper = registry.getMapper(itemXML.localName());
             var itemValue:Object = itemMapper.fromXML(itemXML, deref);
             sequence.push(itemValue);
@@ -43,11 +43,11 @@ public class SequenceMapper extends BaseMapper {
         //Use forEachInCollection() loop wrapper because ArrayList doesn't support for each() loop
         TypeUtil.forEachInCollection(sequence,
                 function (itemValue:Object, i:int, collection:Object):void {
-                    var itemValueType:ClassInfo;
-                    if (itemValue != null) {
-                        itemValueType = ClassInfo.forInstance(itemValue);
+                    var itemType:ClassInfo;
+                    if (itemValue) {
+                        itemType = ClassInfo.forInstance(itemValue);
                     }
-                    const itemValueMapper:AStreamMapper = registry.getMapper(itemValueType);
+                    const itemValueMapper:AStreamMapper = registry.getMapper(itemType);
                     const itemResult:XML = itemValueMapper.toXML(itemValue, ref);
                     xml.appendChild(itemResult);
                 }
@@ -55,8 +55,8 @@ public class SequenceMapper extends BaseMapper {
     }
 
     protected function setSequence(instance:Object, sequence:Array):void {
-
     }
+
     protected function getSequence(instance:Object):Object {
         return null;
     }

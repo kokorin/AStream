@@ -89,8 +89,17 @@ public class AStream {
     }
 
     public function implicitCollection(clazz:Class, propertyName:String, itemName:String, itemClazz:Class):void {
-        registry.implicitCollection(ClassInfo.forClass(clazz), propertyName, itemName, ClassInfo.forClass(itemClazz));
+        registry.implicit(ClassInfo.forClass(clazz), propertyName, itemName, ClassInfo.forClass(itemClazz), null);
         needReset = true;
+    }
+
+    public function implicitMap(clazz:Class, propertyName:String, itemName:String, itemClazz:Class, keyProperty:String):void {
+        registry.implicit(ClassInfo.forClass(clazz), propertyName, itemName, ClassInfo.forClass(itemClazz), keyProperty);
+        needReset = true;
+    }
+
+    public function orderProperty(order:int, clazz:Class, propertyName:String):void {
+        registry.order(order, ClassInfo.forClass(clazz), propertyName);
     }
 
     public function autodetectMetadata(value:Boolean):void {

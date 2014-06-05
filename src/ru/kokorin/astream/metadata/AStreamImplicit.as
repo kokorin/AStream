@@ -21,5 +21,6 @@ public class AStreamImplicit {
     [DefaultProperty]
     public var itemName:String;
     public var itemType:String;
+    public var keyProperty:String;
 }
 }

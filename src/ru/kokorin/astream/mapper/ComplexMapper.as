@@ -52,23 +52,36 @@ public class ComplexMapper extends BaseMapper {
             var propertyHandler:PropertyHandler = null;
             var propertyAlias:String = registry.getAliasProperty(classInfo, property.name);
             var asAttribute:Boolean = registry.getAttribute(classInfo, property.name);
-            var asImplicitCollection:Boolean = registry.getImplicitCollection(classInfo, property.name);
+            var asImplicit:Boolean = registry.getImplicit(classInfo, property.name);
             var attributeName:String = null;
             var elementName:String = null;
 
             if (asAttribute && TypeUtil.isSimple(property.type)) {
                 attributeName = propertyAlias;
                 propertyHandler = new AttributeHandler(property, propertyAlias, registry);
-            } else if (asImplicitCollection && TypeUtil.isCollection(property.type)) {
+            } else if (asImplicit) {
                 var itemName:String = registry.getImplicitItemName(classInfo, property.name);
                 var itemType:ClassInfo = registry.getImplicitItemType(classInfo, property.name);
-                if (itemType == null && TypeUtil.isVector(property.type)) {
-                    itemType = TypeUtil.getVectorItemType(property.type);
+
+                if (itemName != null && itemName.length > 0) {
+                    if (TypeUtil.isCollection(property.type)) {
+                        if (itemType == null && TypeUtil.isVector(property.type)) {
+                            itemType = TypeUtil.getVectorItemType(property.type);
+                        }
+                        if (itemType != null) {
+                            elementName = itemName;
+                            propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
+                        }
+                    } else if (TypeUtil.isMap(property.type)) {
+                        var keyPropertyName:String = registry.getImplicitKeyProperty(classInfo, property.name);
+                        var keyProperty:Property = itemType.getProperty(keyPropertyName);
+                        if (itemType != null && keyProperty != null) {
+                            elementName = itemName;
+                            propertyHandler = new ImplicitMapHandler(property, itemName, itemType, keyProperty, registry);
+                        }
+                    }
                 }
-                if (itemName != null && itemName.length > 0 && itemType != null) {
-                    elementName = itemName;
-                    propertyHandler = new ImplicitCollectionHandler(property, itemName, itemType, registry);
-                }
+
             }
             // Use ChildElementHandler by default
             if (propertyHandler == null) {
@@ -253,6 +266,59 @@ class ImplicitCollectionHandler implements PropertyHandler {
         if (items.length > 0) {
             result = property.type.newInstance([]);
             TypeUtil.addToCollection(result, items);
+        }
+
+        property.setValue(parentInstance, result);
+    }
+}
+
+class ImplicitMapHandler implements PropertyHandler {
+    private var property:Property;
+    private var itemName:String;
+    private var itemType:ClassInfo;
+    private var keyProperty:Property;
+    private var registry:AStreamRegistry;
+
+    public function ImplicitMapHandler(property:Property, itemName:String, itemType:ClassInfo,
+                                            keyProperty:Property, registry:AStreamRegistry)
+    {
+        this.property = property;
+        this.itemName = itemName;
+        this.itemType = itemType;
+        this.keyProperty = keyProperty;
+        this.registry = registry;
+    }
+
+    public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
+        const value:Object = property.getValue(parentInstance);
+        const itemMapper:AStreamMapper = registry.getMapper(itemType);
+        TypeUtil.forEachInMap(value,
+                function (value:Object, key:Object, map:Object):void {
+                    if (value == null) {
+                        throw Error("Null items cannot be mapped in implicit map");
+                    }
+                    const result:XML = itemMapper.toXML(value, ref, itemName);
+                    parentXML.appendChild(result);
+                }
+        );
+    }
+
+    public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
+        var result:Object;
+        const itemMapper:AStreamMapper = registry.getMapper(itemType);
+        const keys:Array = new Array();
+        const values:Array = new Array();
+
+        for each (var itemXML:XML in parentXML.elements(itemName)) {
+            var value:Object = itemMapper.fromXML(itemXML, deref);
+            var key:Object = keyProperty.getValue(value);
+            keys.push(key);
+            values.push(value);
+        }
+
+        if (keys.length > 0) {
+            result = property.type.newInstance([]);
+            TypeUtil.putToMap(result, keys, values);
         }
 
         property.setValue(parentInstance, result);

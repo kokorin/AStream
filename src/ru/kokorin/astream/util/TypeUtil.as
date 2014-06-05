@@ -17,11 +17,20 @@
 package ru.kokorin.astream.util {
 import as3.lang.Enum;
 
+import flash.utils.Dictionary;
+
+import org.spicefactory.lib.collection.List;
+
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 public class TypeUtil {
     private static const SIMPLE_TYPES:Array = [Boolean, int, uint, Number, String, Date, Enum];
+    private static const MAP_CLASSES:Array = [
+        ClassInfo.forClass(Object),
+        ClassInfo.forClass(Dictionary),
+        ClassInfo.forClass(Map)
+    ];
     private static const ILIST_TYPE:ClassInfo = getIListInfo();
     private static const IS_VECTOR_MAP:Map = new Map();
     private static const ITEM_TYPE_MAP:Map = new Map();
@@ -39,10 +48,17 @@ public class TypeUtil {
         return false;
     }
 
+    /** Checks if supplied type is a Map:
+     *  Object, flash.utils.Dictionary, org.spicefactory.lib.collection.Map
+     * @param classInfo - type to check*/
+    public static function isMap(classInfo:ClassInfo):Boolean {
+        return MAP_CLASSES.indexOf(classInfo) != -1;
+    }
+
     /** Checks if supplied type implements mx.collections.IList interface.
      *  Does not depend on IList.
      *  @param classInfo - type to check*/
-    public static function isList(classInfo:ClassInfo):Boolean {
+    private static function isList(classInfo:ClassInfo):Boolean {
         return ILIST_TYPE != null && classInfo.isType(ILIST_TYPE.getClass());
     }
 
@@ -64,11 +80,11 @@ public class TypeUtil {
         return result;
     }
 
-    /** Checks if supplied type is either Array, IList or Vector.
+    /** Checks if supplied type is either Array, Vector, mx.collections.IList or org.spicefactory.lib.collection.List
      *  Does not depend on IList or Vector.
      *  @param classInfo - type to check*/
     public static function isCollection(classInfo:ClassInfo):Boolean {
-        return classInfo.isType(Array) || isList(classInfo) || isVector(classInfo);
+        return classInfo.isType(Array) || classInfo.isType(List) || isList(classInfo) || isVector(classInfo);
     }
 
     public static function getVectorItemType(classInfo:ClassInfo):ClassInfo {
@@ -94,6 +110,11 @@ public class TypeUtil {
             for each (item in items) {
                 array.push(item);
             }
+        } else if (collectionInfo.isType(List)) {
+            const list:List = collection as List;
+            for each (item in items) {
+                list.add(item);
+            }
         } else if (isList(collectionInfo)) {
             for each (item in items) {
                 collection.addItem(item);
@@ -104,7 +125,6 @@ public class TypeUtil {
             }
         }
     }
-
 
     /**
      * @param collection:Object — collection to iterate through
@@ -120,6 +140,9 @@ public class TypeUtil {
         if (collectionInfo.isType(Array)) {
             const array:Array = collection as Array;
             array.forEach(callback, null);
+        } else if (collectionInfo.isType(List)) {
+            const list:List = collection as List;
+            list.toArray().forEach(callback, null);
         } else if (isList(collectionInfo)) {
             for (var i:int = 0; i < collection.length; i++) {
                 var item:Object = collection.getItemAt(i);
@@ -127,6 +150,40 @@ public class TypeUtil {
             }
         } else if (isVector(collectionInfo)) {
             collection.forEach(callback, null);
+        }
+    }
+
+    public static function putToMap(map:Object, keys:Array, values:Array):void {
+        if (map == null || keys == null || values == null) {
+            return;
+        }
+        const mapInstance:Map = map as Map;
+        if (mapInstance) {
+            for (var i:int = 0; i < keys.length; i++) {
+                mapInstance.put(keys[i], values[i]);
+            }
+        } else {
+            for (i = 0; i < keys.length; i++) {
+                map[keys[i]] = values[i];
+            }
+        }
+    }
+    /**
+     * @param map:Object — map to iterate through
+     * @param callback:Function — The function to run on each item in the array.
+     * This function is invoked with three arguments:
+        function callback(item:*, key:*, map:Object):void;
+     */
+    public static function forEachInMap(map:Object, callback:Function):void {
+        if (map == null || callback == null) {
+            return;
+        }
+        if (map is Map) {
+            map = (map as Map).toDictionary();
+        }
+        for (var key:Object in map) {
+            var value:Object = map[key];
+            callback(value, key, map);
         }
     }
 

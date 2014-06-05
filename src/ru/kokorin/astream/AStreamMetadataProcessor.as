@@ -94,10 +94,8 @@ public class AStreamMetadataProcessor {
                 }
 
                 var collectionItemType:ClassInfo = null;
-                if (TypeUtil.isCollection(property.type)) {
-                    if (TypeUtil.isVector(property.type)) {
-                        collectionItemType = TypeUtil.getVectorItemType(property.type);
-                    }
+                if (TypeUtil.isVector(property.type)) {
+                    collectionItemType = TypeUtil.getVectorItemType(property.type);
                 }
                 if (collectionItemType != null) {
                     processMetadata(collectionItemType);
@@ -112,7 +110,7 @@ public class AStreamMetadataProcessor {
                     } else if (collectionItemType != null) {
                         implicitItemType = collectionItemType;
                     }
-                    registry.implicitCollection(classInfo, property.name, implicitMeta.itemName, implicitItemType);
+                    registry.implicit(classInfo, property.name, implicitMeta.itemName, implicitItemType, implicitMeta.keyProperty);
                 }
 
             }

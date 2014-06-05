@@ -175,20 +175,25 @@ public class AStreamRegistry {
         return getClassData(classInfo).getPropertyData(propertyName).omit;
     }
 
-    public function implicitCollection(classInfo:ClassInfo, propertyName:String, itemName:String, itemType:ClassInfo):void {
+    public function implicit(classInfo:ClassInfo, propertyName:String,
+                                itemName:String, itemType:ClassInfo, keyProperty:String):void {
         const propertyData:PropertyData = getClassData(classInfo).getPropertyData(propertyName);
-        propertyData.implicitCollection = true;
+        propertyData.implicit = true;
         propertyData.implicitItemName = itemName;
         propertyData.implicitItemType = itemType;
+        propertyData.implicitKeyProperty = keyProperty;
     }
-    public function getImplicitCollection(classInfo:ClassInfo, propertyName:String):Boolean {
-        return getClassData(classInfo).getPropertyData(propertyName).implicitCollection;
+    public function getImplicit(classInfo:ClassInfo, propertyName:String):Boolean {
+        return getClassData(classInfo).getPropertyData(propertyName).implicit;
     }
     public function getImplicitItemName(classInfo:ClassInfo, propertyName:String):String {
         return getClassData(classInfo).getPropertyData(propertyName).implicitItemName;
     }
     public function getImplicitItemType(classInfo:ClassInfo, propertyName:String):ClassInfo {
         return getClassData(classInfo).getPropertyData(propertyName).implicitItemType;
+    }
+    public function getImplicitKeyProperty(classInfo:ClassInfo, propertyName:String):String {
+        return getClassData(classInfo).getPropertyData(propertyName).implicitKeyProperty;
     }
 
     public function order(value:int, classInfo:ClassInfo, propertyName:String):void {
@@ -264,8 +269,9 @@ class PropertyData {
     public var alias:String;
     public var attribute:Boolean = false;
     public var omit:Boolean = false;
-    public var implicitCollection:Boolean = false;
+    public var implicit:Boolean = false;
     public var implicitItemName:String = null;
     public var implicitItemType:ClassInfo = null;
+    public var implicitKeyProperty:String = null;
     public var order:int = int.MAX_VALUE;
 }

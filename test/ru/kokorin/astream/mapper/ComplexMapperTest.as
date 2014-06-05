@@ -40,10 +40,42 @@ public class ComplexMapperTest {
         assertEquals("Restored complex object", original.describe(), restored.describe());
     }
 
+    [Test]
+    public function testImplicit():void {
+        registry.implicit(TEST_VO, "children", "child", TEST_VO, null);
+        registry.implicit(TEST_VO, "value4", "mapValue", TEST_VO, "name");
+
+        original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")];
+        original.value4 = {"First":new TestVO("First"), "Second":new TestVO("Second"), "Third":new TestVO("Third")};
+
+        const xml:XML = complexMapper.toXML(original, noRef);
+        const restored:TestVO = complexMapper.fromXML(xml, noRef) as TestVO;
+
+        for (var i:int = 0; i < original.children.length; i++) {
+            var originalChild:TestVO = original.children[i] as TestVO;
+            var restoredChild:TestVO = restored.children[i] as TestVO;
+            assertEquals("Restored and original child", originalChild.describe(), restoredChild.describe());
+        }
+
+        for (var key:Object in original.value4) {
+            var originalValue:TestVO = original.value4[key] as TestVO;
+            var restoredValue:TestVO = restored.value4[key] as TestVO;
+            assertEquals("Restored and original child", originalValue.describe(), restoredValue.describe());
+        }
+    }
+
     [Test(expects="Error")]
     public function testNullInImplicitCollection():void {
-        registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
+        registry.implicit(TEST_VO, "children", "child", TEST_VO, null);
         original.children = [new TestVO("First"), null, new TestVO("Third")];
+
+        complexMapper.toXML(original, noRef);
+    }
+
+    [Test(expects="Error")]
+    public function testNullInImplicitMap():void {
+        registry.implicit(TEST_VO, "value4", "mapValue", TEST_VO, "name");
+        original.value4 = {"First":new TestVO("First"), "Second":null, "Third":new TestVO("Third")};
 
         complexMapper.toXML(original, noRef);
     }
@@ -60,11 +92,10 @@ public class ComplexMapperTest {
     [Test(expects="Error")]
     public function testAmbiguousElements():void {
         registry.aliasProperty("child", TEST_VO, "value1");
-        registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
+        registry.implicit(TEST_VO, "children", "child", TEST_VO, null);
 
         complexMapper.toXML(original, noRef);
     }
-
 
     [Test]
     public function testReset():void {
@@ -73,7 +104,7 @@ public class ComplexMapperTest {
         noRef.clear();
 
         registry.alias("test", TEST_VO);
-        registry.implicitCollection(TEST_VO, "children", "child", TEST_VO);
+        registry.implicit(TEST_VO, "children", "child", TEST_VO, null);
         const xmlAfterAlias:XML = complexMapper.toXML(original, noRef);
         noRef.clear();
 
