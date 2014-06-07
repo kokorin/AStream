@@ -15,6 +15,10 @@
  */
 
 package ru.kokorin.astream {
+import flash.utils.ByteArray;
+
+import org.spicefactory.lib.collection.List;
+
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
@@ -34,10 +38,16 @@ public class AStreamRegistry {
     private const mapperFactory:AStreamMapperFactory = new AStreamMapperFactory();
     private const converterFactory:AStreamConverterFactory = new AStreamConverterFactory();
 
-    private static const VECTOR_ALIAS:String = "vector-";
+    private static const VECTOR_POSTFIX:String = "-array";
+    private static const VECTOR_POSTFIX_LENGTH:int = VECTOR_POSTFIX.length;
 
     public function AStreamRegistry() {
         alias("null", null);
+        alias("string", ClassInfo.forClass(String));
+        alias("date", ClassInfo.forClass(Date));
+        alias("byte-array", ClassInfo.forClass(ByteArray));
+        alias("list", ClassInfo.forClass(List));
+        alias("map", ClassInfo.forClass(Map));
         metadataProcessor = new AStreamMetadataProcessor(this);
     }
 
@@ -111,7 +121,7 @@ public class AStreamRegistry {
         }
 
         if (TypeUtil.isVector(classInfo)) {
-            return VECTOR_ALIAS + getAlias(TypeUtil.getVectorItemType(classInfo));
+            return getAlias(TypeUtil.getVectorItemType(classInfo)) + VECTOR_POSTFIX;
         }
 
         const pckgAndName:Array = classInfo.name.split("::");
@@ -130,12 +140,14 @@ public class AStreamRegistry {
     /** Declared as internal for tests*/
     internal function getClass(nameOrAlias:String):ClassInfo {
         if (classByAliasMap.containsKey(nameOrAlias)) {
-            return classByAliasMap.get(nameOrAlias);
+            return classByAliasMap.get(nameOrAlias) as ClassInfo;
         }
 
-        const beginsWithVector:Boolean = nameOrAlias.indexOf(VECTOR_ALIAS) == 0;
-        if (beginsWithVector) {
-            nameOrAlias = nameOrAlias.substr(VECTOR_ALIAS.length);
+        const lastPostfixIndex:int = nameOrAlias.lastIndexOf(VECTOR_POSTFIX);
+        const endsWithVector:Boolean = lastPostfixIndex != -1 &&
+                            lastPostfixIndex == (nameOrAlias.length - VECTOR_POSTFIX_LENGTH);
+        if (endsWithVector) {
+            nameOrAlias = nameOrAlias.substr(0, lastPostfixIndex);
             const vectorItemType:ClassInfo = getClass(nameOrAlias);
             return TypeUtil.constructVectorWithItemType(vectorItemType);
         }

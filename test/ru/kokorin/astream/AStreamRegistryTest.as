@@ -2,6 +2,8 @@ package ru.kokorin.astream {
 import org.flexunit.asserts.assertEquals;
 import org.spicefactory.lib.reflect.ClassInfo;
 
+import ru.kokorin.astream.valueobject.ExtVO;
+
 import ru.kokorin.astream.valueobject.TestVO;
 
 [RunWith("org.flexunit.runners.Parameterized")]
@@ -33,6 +35,18 @@ public class AStreamRegistryTest {
 
         assertEquals("getAlias("+clazz+")", alias, registry.getAlias(classInfo));
         assertEquals("getClass("+alias+")", classInfo, registry.getClass(alias));
+    }
+
+    public static var ALIAS_DATA:Array = [
+        [Vector.<Object>, "Object-array"],
+        [Vector.<TestVO>, "ru.kokorin.astream.valueobject.TestVO-array"],
+        [Vector.<int>, "int-array"]
+    ];
+    [Test(dataProvider="ALIAS_DATA")]
+    public function testVectorAlias(type:Class, alias:String):void {
+        const info:ClassInfo = ClassInfo.forClass(type);
+        assertEquals("Alias by class", registry.getAlias(info), alias);
+        assertEquals("Class by alias", registry.getClass(alias), info);
     }
 }
 }

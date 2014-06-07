@@ -25,6 +25,7 @@ import ru.kokorin.astream.metadata.AStreamAsAttribute;
 import ru.kokorin.astream.metadata.AStreamImplicit;
 import ru.kokorin.astream.metadata.AStreamOmitField;
 import ru.kokorin.astream.metadata.AStreamOrder;
+import ru.kokorin.astream.metadata.ArrayElementType;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class AStreamMetadataProcessor {
@@ -37,7 +38,8 @@ public class AStreamMetadataProcessor {
         AStreamAsAttribute,
         AStreamOmitField,
         AStreamImplicit,
-        AStreamOrder
+        AStreamOrder,
+        ArrayElementType
     ];
 
     public function AStreamMetadataProcessor(registry:AStreamRegistry) {
@@ -96,6 +98,11 @@ public class AStreamMetadataProcessor {
                 var collectionItemType:ClassInfo = null;
                 if (TypeUtil.isVector(property.type)) {
                     collectionItemType = TypeUtil.getVectorItemType(property.type);
+                } else if (property.type.isType(Array)) {
+                    var elementTypeMeta:ArrayElementType = getMetadata(property, ArrayElementType) as ArrayElementType;
+                    if (elementTypeMeta != null) {
+                        collectionItemType = ClassInfo.forName(elementTypeMeta.elementType);
+                    }
                 }
                 if (collectionItemType != null) {
                     processMetadata(collectionItemType);
