@@ -16,14 +16,17 @@ public class AStreamRegistryTest {
     }
 
     public static var PACKAGE_ALIAS_DATA:Array = [
-        [{}, "String", String],
+        [{}, "string", String],
         [{}, "ru.kokorin.astream.valueobject.TestVO", TestVO],
         [{"su":"ru"}, "su.kokorin.astream.valueobject.TestVO", TestVO],
         [{"su":"ru", "sukokorin":"ru.kokorin"}, "sukokorin.astream.valueobject.TestVO", TestVO],
         [{"su":"ru", "sukokorin":"ru.kokorin"}, "sukokorin.astream.valueobject.TestVO", TestVO],
         [{"su":"ru", "sukokorin":"ru.kokorin", "sukokorinastream":"ru.kokorin.astream"}, "sukokorinastream.valueobject.TestVO", TestVO],
         [{"":"ru.kokorin.astream.valueobject"}, "TestVO", TestVO],
-        [{"as3.lang":""}, "as3.lang.String", String]
+        [{"com.test":""}, "com.test.AllTests", AllTests],
+
+        //Primitive types have implicit alias set. Package alias doesn't affect them.
+        [{"as3.lang":""}, "string", String]
     ];
     [Test(dataProvider="PACKAGE_ALIAS_DATA")]
     public function testAliasPackage(aliases:Object, alias:String, clazz:Class):void {

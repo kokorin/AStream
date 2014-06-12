@@ -64,7 +64,7 @@ public class SimpleMapperTest {
         const restored:String = simpleMapper.fromXML(xml, null) as String;
 
         assertEquals("Restored String", value, restored);
-        assertEquals("Escaped in XML", "<String>"+xmlText+"</String>", xml.toXMLString());
+        assertEquals("Escaped in XML", "<string>"+xmlText+"</string>", xml.toXMLString());
     }
 
     public static var TEXT_ENCODED_PAIRS:Array = [

@@ -16,7 +16,7 @@
 
 package ru.kokorin.astream.converter {
 public class DateConverter implements AStreamConverter {
-    private static const UTC_REGEXP:RegExp = /(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d).(\d{3}) UTC/;
+    private static const UTC_REGEXP:RegExp = /(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d).(\d{1,3}) UTC/;
     public function fromString(string:String):Object {
         var result:Date = null;
         if (string != null) {
@@ -39,7 +39,7 @@ public class DateConverter implements AStreamConverter {
                     pol(date.getUTCHours()) + ":" +
                     pol(date.getUTCMinutes()) + ":" +
                     pol(date.getUTCSeconds()) + "." +
-                    pol(date.getUTCMilliseconds(), 3) + " UTC";
+                    date.getUTCMilliseconds() + " UTC";
         }
         return null;
     }

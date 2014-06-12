@@ -44,6 +44,9 @@ public class AStreamRegistry {
     public function AStreamRegistry() {
         alias("null", null);
         alias("string", ClassInfo.forClass(String));
+        alias("float", ClassInfo.forClass(Number));
+        alias("int", ClassInfo.forClass(int));
+        alias("uint", ClassInfo.forClass(uint));
         alias("date", ClassInfo.forClass(Date));
         alias("byte-array", ClassInfo.forClass(ByteArray));
         alias("list", ClassInfo.forClass(List));
