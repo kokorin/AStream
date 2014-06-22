@@ -15,41 +15,29 @@
  */
 
 package ru.kokorin.astream.converter {
+import org.spicefactory.lib.collection.Map;
+
+import ru.kokorin.astream.util.SimpleDateFormat;
+
 public class DateConverter implements AStreamConverter {
-    private static const UTC_REGEXP:RegExp = /(\d{4})-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d).(\d{1,3}) UTC/;
-    public function fromString(string:String):Object {
-        var result:Date = null;
-        if (string != null) {
-            const utcMatch:Array = string.match(UTC_REGEXP);
-            if (utcMatch != null && utcMatch.length == 8) {
-                result = new Date(0);
-                result.setUTCFullYear(parseInt(utcMatch[1]), parseInt(utcMatch[2])-1, parseInt(utcMatch[3]));
-                result.setUTCHours(parseInt(utcMatch[4]), parseInt(utcMatch[5]), parseInt(utcMatch[6]), parseInt(utcMatch[7]));
-            }
+    private static const formatterMap:Map = new Map();
+
+    private var formatter:SimpleDateFormat;
+
+    public function DateConverter(pattern:String = "yyyy-MM-dd HH:mm:ss.S z") {
+        formatter = formatterMap.get(pattern) as SimpleDateFormat;
+        if (formatter == null) {
+            formatter = new SimpleDateFormat(pattern);
+            formatterMap.put(pattern, formatter);
         }
-        return result;
+    }
+
+    public function fromString(string:String):Object {
+        return formatter.parse(string);
     }
 
     public function toString(value:Object):String {
-        const date:Date = value as Date;
-        if (date != null) {
-            return pol(date.getUTCFullYear(), 4) + "-" +
-                    pol(date.getUTCMonth()+1) + "-" +
-                    pol(date.getUTCDate()) + " " +
-                    pol(date.getUTCHours()) + ":" +
-                    pol(date.getUTCMinutes()) + ":" +
-                    pol(date.getUTCSeconds()) + "." +
-                    date.getUTCMilliseconds() + " UTC";
-        }
-        return null;
-    }
-
-    private static function pol(value:int, length:int = 2):String {
-        var result:String = String(value);
-        while (result.length < length) {
-            result = "0" + result;
-        }
-        return result;
+        return formatter.format(value as Date);
     }
 }
 }

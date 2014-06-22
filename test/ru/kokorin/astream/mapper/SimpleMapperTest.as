@@ -47,7 +47,7 @@ public class SimpleMapperTest {
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Date = simpleMapper.fromXML(xml, null) as Date;
 
-        assertEquals("Restored Date.time", value.time, restored.time);
+        assertEquals("Restored Date.time", String(value), String(restored));
     }
 
     public static var ESCAPE_PAIRS:Array = [

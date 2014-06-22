@@ -199,7 +199,7 @@ class ChildElementHandler implements PropertyHandler {
             const valueType:ClassInfo = ClassInfo.forInstance(value);
             const valueMapper:AStreamMapper = registry.getMapper(valueType);
             const result:XML = valueMapper.toXML(value, ref, name);
-            /* int is subtype of Number! We do not need class attribute in case of any numbers*/
+            /* int is subtype of Number! We do not need "class" attribute in XML in case of any numbers*/
             if (!valueType.isType(Number) && valueType != property.type) {
                 result.attribute("class")[0] = registry.getAlias(valueType);
             }

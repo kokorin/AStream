@@ -71,13 +71,13 @@ public class AStreamRegistry {
         return classData.converter;
     }
 
-    public function getMapper(nameOrClass:Object):AStreamMapper {
-        var classInfo:ClassInfo = nameOrClass as ClassInfo;
+    public function getMapper(nameOrClassInfo:Object):AStreamMapper {
+        var classInfo:ClassInfo = nameOrClassInfo as ClassInfo;
         if (classInfo == null) {
-            if (nameOrClass is String) {
-                classInfo = getClass(nameOrClass as String);
-            } else if (nameOrClass is Class) {
-                classInfo = ClassInfo.forClass(nameOrClass as Class);
+            if (nameOrClassInfo is String) {
+                classInfo = getClass(nameOrClassInfo as String);
+            } else if (nameOrClassInfo is Class) {
+                classInfo = ClassInfo.forClass(nameOrClassInfo as Class);
             }
         }
 
