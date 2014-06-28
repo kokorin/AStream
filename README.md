@@ -77,3 +77,18 @@ const restoredUser:User = aStream.fromXML(xml) as User;
 /* restoredUser.toString()
 User{_name=Ivanov Ivan,id=1,role=ADMINISTRATOR} */
 ```        
+
+**Сorresponding types**
+
+         Java        |         XML         |                AS3       
+---------------------|---------------------|------------------------------------
+       byte[]        |      byte-array     |              ByteArray
+       Type[]        |      Type-array     |         Vector.&lt;Type&gt;
+ java.util.ArrayList |        list         | org.spicefactory.lib.collection.List
+  java.util.HashMap  |         map         | org.spicefactory.lib.collection.Map
+    Float, float     |        float        |               Number                  
+    Integer, int     |         int         |                int                  
+   java.util.Date    |         date        |                Date
+      String         |        string       |               String                 
+      
+      
