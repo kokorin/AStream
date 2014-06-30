@@ -17,7 +17,9 @@
 package ru.kokorin.astream {
 import org.spicefactory.lib.reflect.ClassInfo;
 
-import ru.kokorin.astream.mapper.AStreamMapper;
+import ru.kokorin.astream.converter.Converter;
+
+import ru.kokorin.astream.mapper.Mapper;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.IdRef;
 import ru.kokorin.astream.ref.NoRef;
@@ -68,6 +70,10 @@ public class AStream {
         needReset = true;
     }
 
+    public function registerConverter(clazz:Class, converter:Converter):void {
+
+    }
+
     public function alias(name:String, clazz:Class):void {
         registry.alias(name, ClassInfo.forClass(clazz));
         needReset = true;
@@ -112,7 +118,7 @@ public class AStream {
         if (object != null) {
             classInfo = ClassInfo.forInstance(object);
         }
-        const mapper:AStreamMapper = registry.getMapper(classInfo);
+        const mapper:Mapper = registry.getMapper(classInfo);
         var result:XML;
         try {
             result = mapper.toXML(object, ref);
@@ -124,7 +130,7 @@ public class AStream {
 
     public function fromXML(xml:XML):Object {
         reset();
-        const mapper:AStreamMapper = registry.getMapper(xml.localName());
+        const mapper:Mapper = registry.getMapper(xml.localName());
         var result:Object;
         try {
             result = mapper.fromXML(xml, ref);

@@ -4,6 +4,8 @@ import flash.utils.getQualifiedClassName;
 public class TestVO {
     public var name:String;
     public var enum:EnumVO;
+    public var date:Date;
+    public var date2:Date;
     public var value1:Number;
     public var value2:int = 2147483640;
     public var value3:uint = 4294967290;
@@ -23,6 +25,12 @@ public class TestVO {
         const result:Array = [name];
         if (enum != null) {
             result.push("enum="+enum);
+        }
+        if (date != null) {
+            result.push("date="+date);
+        }
+        if (date2 != null) {
+            result.push("date2="+date2);
         }
         if (!isNaN(value1)) {
             result.push("value1="+value1);

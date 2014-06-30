@@ -20,7 +20,7 @@ import as3.lang.Enum;
 import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Property;
 
-public class EnumConverter implements AStreamConverter {
+public class EnumConverter implements Converter {
     private var classInfo:ClassInfo;
 
     public function EnumConverter(classInfo:ClassInfo) {

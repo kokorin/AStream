@@ -6,6 +6,8 @@ import org.flexunit.asserts.assertNotNull;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
+import ru.kokorin.astream.converter.Converter;
+import ru.kokorin.astream.converter.DateConverter;
 import ru.kokorin.astream.valueobject.EnumVO;
 
 [RunWith("org.flexunit.runners.Parameterized")]
@@ -44,6 +46,17 @@ public class SimpleMapperTest {
     public function testDate():void {
         const value:Date = new Date();
         const simpleMapper:SimpleMapper = new SimpleMapper(DATE_CLASS, registry);
+        const xml:XML = simpleMapper.toXML(value, null);
+        const restored:Date = simpleMapper.fromXML(xml, null) as Date;
+
+        assertEquals("Restored Date.time", String(value), String(restored));
+    }
+
+    [Test]
+    public function testDateConverter():void {
+        const value:Date = new Date(2013, 10, 13, 0, 0, 0, 0);
+        const converter:Converter = new DateConverter("yyyy-MM-dd");
+        const simpleMapper:SimpleMapper = new SimpleMapper(DATE_CLASS, registry, converter);
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Date = simpleMapper.fromXML(xml, null) as Date;
 

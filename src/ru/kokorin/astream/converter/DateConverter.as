@@ -19,25 +19,25 @@ import org.spicefactory.lib.collection.Map;
 
 import ru.kokorin.astream.util.SimpleDateFormat;
 
-public class DateConverter implements AStreamConverter {
-    private static const formatterMap:Map = new Map();
+public class DateConverter implements Converter {
+    private static const formatMap:Map = new Map();
 
-    private var formatter:SimpleDateFormat;
+    private var format:SimpleDateFormat;
 
     public function DateConverter(pattern:String = "yyyy-MM-dd HH:mm:ss.S z") {
-        formatter = formatterMap.get(pattern) as SimpleDateFormat;
-        if (formatter == null) {
-            formatter = new SimpleDateFormat(pattern);
-            formatterMap.put(pattern, formatter);
+        format = formatMap.get(pattern) as SimpleDateFormat;
+        if (format == null) {
+            format = new SimpleDateFormat(pattern);
+            formatMap.put(pattern, format);
         }
     }
 
     public function fromString(string:String):Object {
-        return formatter.parse(string);
+        return format.parse(string);
     }
 
     public function toString(value:Object):String {
-        return formatter.format(value as Date);
+        return format.format(value as Date);
     }
 }
 }

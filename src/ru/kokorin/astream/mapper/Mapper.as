@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package ru.kokorin.astream.converter {
-public class BooleanConverter implements Converter {
-    public function fromString(string:String):Object {
-        return string == "true";
-    }
+package ru.kokorin.astream.mapper {
+import ru.kokorin.astream.ref.AStreamRef;
 
-    public function toString(value:Object):String {
-        return String(value);
-    }
+public interface Mapper {
+    function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML;
+    function fromXML(xml:XML, ref:AStreamRef):Object;
+
+    function reset():void;
 }
 }

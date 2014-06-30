@@ -78,7 +78,7 @@ const restoredUser:User = aStream.fromXML(xml) as User;
 User{_name=Ivanov Ivan,id=1,role=ADMINISTRATOR} */
 ```        
 
-**Сorresponding types**
+**Сorresponding types (by default)**
 
          Java        |         XML         |                AS3       
 ---------------------|---------------------|------------------------------------

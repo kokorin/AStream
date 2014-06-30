@@ -98,7 +98,6 @@ public class SimpleDateFormat {
         ["Central Daylight Time", "CDT", "-0500"],
         ["Central European Summer Time", "CEST", "+0200"],
         ["Central European Time", "CET", "+0100"],
-        ["Central European Time", "CET", "+0100"],
         ["Chatham Island Daylight Time", "CHADT", "+1345"],
         ["Chatham Island Standard Time", "CHAST", "+1245"],
         ["Cook Island Time", "CKT", "-1000"],
@@ -121,19 +120,11 @@ public class SimpleDateFormat {
         ["East Africa Time", "EAT", "+0300"],
         ["Ecuador Time", "ECT", "-0500"],
         ["Eastern Daylight Time", "EDT", "-0400"],
-        ["Eastern Daylight Time", "EDT", "-0400"],
         ["Eastern European Summer Time", "EEST", "+0300"],
-        ["Eastern European Summer Time", "EEST", "+0300"],
-        ["Eastern European Summer Time", "EEST", "+0300"],
-        ["Eastern European Time", "EET", "+0200"],
-        ["Eastern European Time", "EET", "+0200"],
         ["Eastern European Time", "EET", "+0200"],
         ["Eastern Greenland Summer Time", "EGST", "+0000"],
         ["East Greenland Time", "EGT", "-0100"],
         ["Eastern Standard Time", "EST", "-0500"],
-        ["Eastern Standard Time", "EST", "-0500"],
-        ["Eastern Standard Time", "EST", "-0500"],
-        ["Tiempo del Este", "ET", "-0500"],
         ["Tiempo del Este", "ET", "-0500"],
         ["Tiempo Del Este ", "ET", "-0500"],
         ["Foxtrot Time Zone", "F", "+0600"],
@@ -149,15 +140,12 @@ public class SimpleDateFormat {
         ["French Guiana Time", "GFT", "-0300"],
         ["Gilbert Island Time", "GILT", "+1200"],
         ["Greenwich Mean Time", "GMT", "+0000"],
-        ["Greenwich Mean Time", "GMT", "+0000"],
         ["Gulf Standard Time", "GST", "+0400"],
         ["Guyana Time", "GYT", "-0400"],
         ["Hotel Time Zone", "H", "+0800"],
         ["Heure Avancée de l'Atlantique", "HAA", "-0300"],
-        ["Heure Avancée de l'Atlantique", "HAA", "-0300"],
         ["Heure Avancée du Centre", "HAC", "-0500"],
         ["Hawaii-Aleutian Daylight Time", "HADT", "-0900"],
-        ["Heure Avancée de l'Est ", "HAE", "-0400"],
         ["Heure Avancée de l'Est ", "HAE", "-0400"],
         ["Heure Avancée du Pacifique", "HAP", "-0700"],
         ["Heure Avancée des Rocheuses", "HAR", "-0600"],
@@ -167,12 +155,7 @@ public class SimpleDateFormat {
         ["Hong Kong Time", "HKT", "+0800"],
         ["Hora Legal de Venezuela", "HLV", "-0430"],
         ["Heure Normale de l'Atlantique", "HNA", "-0400"],
-        ["Heure Normale de l'Atlantique", "HNA", "-0400"],
-        ["Heure Normale de l'Atlantique", "HNA", "-0400"],
         ["Heure Normale du Centre", "HNC", "-0600"],
-        ["Heure Normale du Centre", "HNC", "-0600"],
-        ["Heure Normale de l'Est", "HNE", "-0500"],
-        ["Heure Normale de l'Est", "HNE", "-0500"],
         ["Heure Normale de l'Est", "HNE", "-0500"],
         ["Heure Normale du Pacifique", "HNP", "-0800"],
         ["Heure Normale des Rocheuses", "HNR", "-0700"],
@@ -227,8 +210,6 @@ public class SimpleDateFormat {
         ["Newfoundland Standard Time", "NST", "-0330"],
         ["Niue Time", "NUT", "-1100"],
         ["New Zealand Daylight Time", "NZDT", "+1300"],
-        ["New Zealand Daylight Time", "NZDT", "+1300"],
-        ["New Zealand Standard Time", "NZST", "+1200"],
         ["New Zealand Standard Time", "NZST", "+1200"],
         ["Oscar Time Zone", "O", "-0200"],
         ["Omsk Summer Time", "OMSST", "+0700"],
@@ -285,9 +266,7 @@ public class SimpleDateFormat {
         ["West Africa Summer Time", "WAST", "+0200"],
         ["West Africa Time", "WAT", "+0100"],
         ["Western European Summer Time", "WEST", "+0100"],
-        ["Western European Summer Time", "WEST", "+0100"],
         ["Westeuropäische Sommerzeit", "WESZ", "+0100"],
-        ["Western European Time", "WET", "+0000"],
         ["Western European Time", "WET", "+0000"],
         ["Westeuropäische Zeit", "WEZ", "+0000"],
         ["Wallis and Futuna Time", "WFT", "+1200"],
@@ -355,12 +334,13 @@ public class SimpleDateFormat {
         var value:Number = NaN;
         var finish:int = -1;
         var digits:int = 0;
+        var char:String;
 
         if (obeyCount) {
             digits = count;
         } else {
             while (true) {
-                var char:String = text.charAt(start+digits);
+                char = text.charAt(start+digits);
                 if (char >= "0" && char <= "9" ||
                         (char == "-" || char == "+") && digits == 0)
                 {
@@ -479,7 +459,7 @@ public class SimpleDateFormat {
                 }
                 if (newStart > 0) {
                     if (isGMT && ((newStart+5) < text.length)) {
-                        var char:String = text.charAt(newStart);
+                        char = text.charAt(newStart);
                         var delim:String = text.charAt(newStart + 3);
                         if ( (char == "+" || char == "-") && delim == ":") {
                             value = parseFloat(text.substr(newStart, 3) + text.substr(newStart+4, 2));
@@ -611,7 +591,7 @@ public class SimpleDateFormat {
                 break;
             }
             case PATTERN_HOUR1: {
-                var hours:int = date.hours % 12;
+                hours = date.hours % 12;
                 if (hours == 0) {
                     hours = 12;
                 }

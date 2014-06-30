@@ -17,8 +17,16 @@ public class MetaVO {
     [AStreamImplicit("listItem", itemType="String")]
     public var list:IList;
 
+    [AStreamOrder(25)]
+    [ArrayElementType("String")]
+    [AStreamImplicit("list2Item")]
+    public var list2:IList;
+
     [AStreamOrder(30)]
     [AStreamImplicit("vectorItem")]
     public var vector:Vector.<String>;
+
+    [AStreamConverter("ru.kokorin.astream.converter.SomeConverter", params="someParam")]
+    public var some:Object;
 }
 }

@@ -20,8 +20,12 @@ import org.spicefactory.lib.reflect.Metadata;
 import org.spicefactory.lib.reflect.MetadataAware;
 import org.spicefactory.lib.reflect.Property;
 
+import ru.kokorin.astream.converter.Converter;
+import ru.kokorin.astream.mapper.Mapper;
+
 import ru.kokorin.astream.metadata.AStreamAlias;
 import ru.kokorin.astream.metadata.AStreamAsAttribute;
+import ru.kokorin.astream.metadata.AStreamConverter;
 import ru.kokorin.astream.metadata.AStreamImplicit;
 import ru.kokorin.astream.metadata.AStreamOmitField;
 import ru.kokorin.astream.metadata.AStreamOrder;
@@ -38,6 +42,7 @@ public class AStreamMetadataProcessor {
         AStreamAsAttribute,
         AStreamOmitField,
         AStreamImplicit,
+        AStreamConverter,
         AStreamOrder,
         ArrayElementType
     ];
@@ -83,29 +88,45 @@ public class AStreamMetadataProcessor {
                     continue;
                 }
 
+                var converterMeta:AStreamConverter = getMetadata(property, AStreamConverter) as AStreamConverter;
+                if (converterMeta != null) {
+                    var converterType:ClassInfo = ClassInfo.forName(converterMeta.converterType);
+                    var constructorArgs:Array;
+                    if (converterMeta.params != null) {
+                        constructorArgs = converterMeta.params.split(converterMeta.paramDelimiter);
+                    } else {
+                        constructorArgs = new Array();
+                    }
+                    var converter:Object = converterType.newInstance(constructorArgs);
+                    if (converter is Converter) {
+                        registry.registerConverterProperty(converter as Converter, classInfo, property.name);
+                    } else if (converter is Mapper) {
+                        registry.registerMapperProperty(converter as Mapper, classInfo, property.name);
+                    }
+                }
+
                 var propertyAlias:String = getAlias(property);
-                if (propertyAlias) {
+                if (propertyAlias != null) {
                     registry.aliasProperty(propertyAlias, classInfo, property.name);
                 }
-                if (getMetadata(property, AStreamAsAttribute)) {
+                if (getMetadata(property, AStreamAsAttribute) != null) {
                     registry.attribute(classInfo, property.name);
                 }
                 var orderMeta:AStreamOrder = getMetadata(property, AStreamOrder) as AStreamOrder;
-                if (orderMeta) {
+                if (orderMeta != null) {
                     registry.order(orderMeta.order, classInfo, property.name);
                 }
 
-                var collectionItemType:ClassInfo = null;
-                if (TypeUtil.isVector(property.type)) {
-                    collectionItemType = TypeUtil.getVectorItemType(property.type);
-                } else if (property.type.isType(Array)) {
-                    var elementTypeMeta:ArrayElementType = getMetadata(property, ArrayElementType) as ArrayElementType;
-                    if (elementTypeMeta != null) {
-                        collectionItemType = ClassInfo.forName(elementTypeMeta.elementType);
+                var itemType:ClassInfo = null;
+                if (TypeUtil.isCollection(property.type) || TypeUtil.isMap(property.type)) {
+                    if (TypeUtil.isVector(property.type)) {
+                        itemType = TypeUtil.getVectorItemType(property.type);
+                    } else {
+                        for each (var elementTypeMeta:ArrayElementType in property.getMetadata(ArrayElementType)) {
+                            itemType = ClassInfo.forName(elementTypeMeta.elementType);
+                            processMetadata(itemType);
+                        }
                     }
-                }
-                if (collectionItemType != null) {
-                    processMetadata(collectionItemType);
                 }
 
                 var implicitMeta:AStreamImplicit = getMetadata(property, AStreamImplicit) as AStreamImplicit;
@@ -114,8 +135,8 @@ public class AStreamMetadataProcessor {
                     if (implicitMeta.itemType != null) {
                         implicitItemType = ClassInfo.forName(implicitMeta.itemType);
                         processMetadata(implicitItemType);
-                    } else if (collectionItemType != null) {
-                        implicitItemType = collectionItemType;
+                    } else if (itemType != null) {
+                        implicitItemType = itemType;
                     }
                     registry.implicit(classInfo, property.name, implicitMeta.itemName, implicitItemType, implicitMeta.keyProperty);
                 }

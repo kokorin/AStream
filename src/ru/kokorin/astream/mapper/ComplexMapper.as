@@ -142,8 +142,8 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Property;
 
 import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.converter.AStreamConverter;
-import ru.kokorin.astream.mapper.AStreamMapper;
+import ru.kokorin.astream.converter.Converter;
+import ru.kokorin.astream.mapper.Mapper;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
@@ -155,17 +155,16 @@ interface PropertyHandler {
 class AttributeHandler implements PropertyHandler {
     private var property:Property;
     private var name:String;
-    private var registry:AStreamRegistry;
+    private var converter:Converter;
 
     public function AttributeHandler(property:Property, name:String, registry:AStreamRegistry) {
         this.property = property;
         this.name = name;
-        this.registry = registry;
+        this.converter = registry.getConverterProperty(property.owner, property.name);
     }
 
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        const converter:AStreamConverter = registry.getConverter(property.type);
         if (value != null && converter != null) {
             parentXML.attribute(name)[0] = converter.toString(value);
         }
@@ -173,7 +172,6 @@ class AttributeHandler implements PropertyHandler {
 
     public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         const attValue:XML = parentXML.attribute(name)[0];
-        const converter:AStreamConverter = registry.getConverter(property.type);
         var value:Object = null;
         if (attValue != null && converter != null) {
             value = converter.fromString(String(attValue));
@@ -186,22 +184,32 @@ class ChildElementHandler implements PropertyHandler {
     private var property:Property;
     private var name:String;
     private var registry:AStreamRegistry;
+    private var defaultMapper:Mapper;
 
     public function ChildElementHandler(property:Property, name:String, registry:AStreamRegistry) {
         this.property = property;
         this.name = name;
         this.registry = registry;
+        this.defaultMapper = registry.getMapperProperty(property.owner, property.name);
     }
 
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
         if (value != null) {
             const valueType:ClassInfo = ClassInfo.forInstance(value);
-            const valueMapper:AStreamMapper = registry.getMapper(valueType);
-            const result:XML = valueMapper.toXML(value, ref, name);
+            var valueMapper:Mapper;
+            var className:String = null;
             /* int is subtype of Number! We do not need "class" attribute in XML in case of any numbers*/
             if (!valueType.isType(Number) && valueType != property.type) {
-                result.attribute("class")[0] = registry.getAlias(valueType);
+                valueMapper = registry.getMapper(valueType);
+                className = registry.getAlias(valueType);
+            } else {
+                valueMapper = defaultMapper;
+            }
+
+            const result:XML = valueMapper.toXML(value, ref, name);
+            if (className != null) {
+                result.attribute("class")[0] = className;
             }
             parentXML.appendChild(result);
         }
@@ -212,11 +220,11 @@ class ChildElementHandler implements PropertyHandler {
         var value:Object;
         if (elementValue != null) {
             const attAlias:XML = elementValue.attribute("class")[0];
-            var valueMapper:AStreamMapper;
+            var valueMapper:Mapper;
             if (attAlias != null) {
                 valueMapper = registry.getMapper(String(attAlias));
             } else {
-                valueMapper = registry.getMapper(property.type);
+                valueMapper = defaultMapper;
             }
             value = valueMapper.fromXML(elementValue, deref);
         }
@@ -239,7 +247,7 @@ class ImplicitCollectionHandler implements PropertyHandler {
 
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        const itemMapper:AStreamMapper = registry.getMapper(itemType);
+        const itemMapper:Mapper = registry.getMapper(itemType);
         TypeUtil.forEachInCollection(value,
                 function (item:Object, i:int, collection:Object):void {
                     if (item == null) {
@@ -253,7 +261,7 @@ class ImplicitCollectionHandler implements PropertyHandler {
 
     public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         var result:Object;
-        const itemMapper:AStreamMapper = registry.getMapper(itemType);
+        const itemMapper:Mapper = registry.getMapper(itemType);
         const items:Array = new Array();
         for each (var itemXML:XML in parentXML.elements(itemName)) {
             var item:Object = itemMapper.fromXML(itemXML, deref);
@@ -288,7 +296,7 @@ class ImplicitMapHandler implements PropertyHandler {
 
     public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = property.getValue(parentInstance);
-        const itemMapper:AStreamMapper = registry.getMapper(itemType);
+        const itemMapper:Mapper = registry.getMapper(itemType);
         TypeUtil.forEachInMap(value,
                 function (value:Object, key:Object, map:Object):void {
                     if (value == null) {
@@ -302,7 +310,7 @@ class ImplicitMapHandler implements PropertyHandler {
 
     public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         var result:Object;
-        const itemMapper:AStreamMapper = registry.getMapper(itemType);
+        const itemMapper:Mapper = registry.getMapper(itemType);
         const keys:Array = new Array();
         const values:Array = new Array();
 

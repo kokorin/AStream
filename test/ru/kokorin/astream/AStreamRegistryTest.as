@@ -37,7 +37,7 @@ public class AStreamRegistryTest {
         }
 
         assertEquals("getAlias("+clazz+")", alias, registry.getAlias(classInfo));
-        assertEquals("getClass("+alias+")", classInfo, registry.getClass(alias));
+        assertEquals("getClass("+alias+")", classInfo, registry.getClassByName(alias));
     }
 
     public static var ALIAS_DATA:Array = [
@@ -49,7 +49,7 @@ public class AStreamRegistryTest {
     public function testVectorAlias(type:Class, alias:String):void {
         const info:ClassInfo = ClassInfo.forClass(type);
         assertEquals("Alias by class", registry.getAlias(info), alias);
-        assertEquals("Class by alias", registry.getClass(alias), info);
+        assertEquals("Class by alias", registry.getClassByName(alias), info);
     }
 }
 }

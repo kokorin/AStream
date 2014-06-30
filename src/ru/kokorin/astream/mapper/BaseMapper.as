@@ -20,7 +20,7 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
 
-public class BaseMapper implements AStreamMapper {
+public class BaseMapper implements Mapper {
     private var _classInfo:ClassInfo;
     private var _registry:AStreamRegistry;
     private var nodeName:String;

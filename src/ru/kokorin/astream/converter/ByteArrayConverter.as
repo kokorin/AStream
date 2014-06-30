@@ -19,7 +19,7 @@ import com.sociodox.utils.Base64;
 
 import flash.utils.ByteArray;
 
-public class ByteArrayConverter implements AStreamConverter {
+public class ByteArrayConverter implements Converter {
     public function fromString(string:String):Object {
         if (string != null && string.length > 0) {
             return Base64.decode(string);

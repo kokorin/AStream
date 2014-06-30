@@ -8,6 +8,7 @@
 			<name>AStreamImplicit</name>
 			<name>AStreamOmitField</name>
 			<name>AStreamOrder</name>
+			<name>AStreamConverter</name>
 			<name>ArrayElementType</name>
 		</keep-as3-metadata>
 		

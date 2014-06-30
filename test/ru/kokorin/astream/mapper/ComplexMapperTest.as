@@ -5,6 +5,7 @@ import org.flexunit.asserts.assertTrue;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
+import ru.kokorin.astream.converter.DateConverter;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.valueobject.EnumVO;
@@ -114,6 +115,24 @@ public class ComplexMapperTest {
         assertEquals("Before alias and after", xmlBeforeAlias.toXMLString(), xmlAfterAlias.toXMLString());
         assertTrue("After alias still NO 'child' property", xmlAfterAlias.elements("child")[0] === undefined);
         assertTrue("After reset we do have 'child' property", xmlAfterReset.elements("child")[0] !== undefined);
+    }
+
+
+    [Test]
+    public function testConverter():void {
+        registry.attribute(TEST_VO, "date");
+        registry.registerConverterProperty(new DateConverter("yyyy-MM-dd"), TEST_VO, "date");
+        registry.registerConverterProperty(new DateConverter("yyyy-MM-dd"), TEST_VO, "date2");
+        original.date = original.date2 = new Date(2013, 10, 13, 0, 0, 0, 0);
+        original.value4 = new Date(2013, 10, 13, 14, 30, 10, 20);
+
+        const xml:XML = complexMapper.toXML(original, noRef);
+        const restored:TestVO = complexMapper.fromXML(xml, noRef) as TestVO;
+
+        assertEquals("Date in XML attribute", "2013-11-13", String(xml.@date));
+        assertEquals("Date in XML element", "2013-11-13", String(xml.date2));
+        assertEquals("Date", String(original.date), String(restored.date));
+        assertEquals("Date and time", String(original.value4), String(restored.value4));
     }
 }
 }

@@ -18,18 +18,22 @@ package ru.kokorin.astream.mapper {
 import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.converter.AStreamConverter;
+import ru.kokorin.astream.converter.Converter;
 import ru.kokorin.astream.ref.AStreamRef;
 
-public class SimpleMapper implements AStreamMapper {
+public class SimpleMapper implements Mapper {
     private var classInfo:ClassInfo;
     private var registry:AStreamRegistry;
     private var nodeName:String;
-    private var converter:AStreamConverter;
+    private var converter:Converter;
 
-    public function SimpleMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function SimpleMapper(classInfo:ClassInfo, registry:AStreamRegistry, converter:Converter = null) {
         this.classInfo = classInfo;
         this.registry = registry;
+        if (converter == null) {
+            converter = registry.getConverter(classInfo);
+        }
+        this.converter = converter;
         reset();
     }
 
@@ -54,7 +58,6 @@ public class SimpleMapper implements AStreamMapper {
 
     public function reset():void {
         nodeName = registry.getAlias(classInfo);
-        converter = registry.getConverter(classInfo);
     }
 }
 }

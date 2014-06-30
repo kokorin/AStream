@@ -1,7 +1,10 @@
 package ru.kokorin.astream {
 import org.flexunit.asserts.assertEquals;
+import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertTrue;
 import org.spicefactory.lib.reflect.ClassInfo;
+
+import ru.kokorin.astream.converter.SomeConverter;
 
 import ru.kokorin.astream.valueobject.MetaVO;
 
@@ -27,12 +30,18 @@ public class AStreamMetadataProcessorTest {
 
         assertEquals("Implicit list's item name", registry.getImplicitItemName(metaInfo, "list"), "listItem");
         assertEquals("Implicit list's item type", registry.getImplicitItemType(metaInfo, "list").getClass(), String);
+        assertEquals("Implicit list's item name", registry.getImplicitItemName(metaInfo, "list2"), "list2Item");
+        assertEquals("Implicit list's item type", registry.getImplicitItemType(metaInfo, "list2").getClass(), String);
         assertEquals("Implicit vector's item name", registry.getImplicitItemName(metaInfo, "vector"), "vectorItem");
         assertEquals("Implicit vector's item type", registry.getImplicitItemType(metaInfo, "vector").getClass(), String);
 
         assertEquals("Property order (name)", registry.getOrder(metaInfo, "name"), 10);
         assertEquals("Property order (list)", registry.getOrder(metaInfo, "list"), 20);
         assertEquals("Property order (vector)", registry.getOrder(metaInfo, "vector"), 30);
+
+        const someConverter:SomeConverter = registry.getConverterProperty(metaInfo, "some") as SomeConverter;
+        assertNotNull("Converter is set", someConverter);
+        assertEquals("Converter param", "someParam", someConverter.param);
     }
 }
 }

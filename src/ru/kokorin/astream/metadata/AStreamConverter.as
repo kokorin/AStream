@@ -14,9 +14,17 @@
  * limitations under the License.
  */
 
-package ru.kokorin.astream.converter {
-public interface AStreamConverter {
-    function fromString(string:String):Object;
-    function toString(value:Object):String;
+package ru.kokorin.astream.metadata {
+
+[Metadata(name="AStreamConverter")]
+public class AStreamConverter {
+    [DefaultProperty]
+    public var converterType:String;
+
+    public var params:String;
+    public var paramDelimiter:String = ",";
+
+    public function AStreamConverter() {
+    }
 }
 }

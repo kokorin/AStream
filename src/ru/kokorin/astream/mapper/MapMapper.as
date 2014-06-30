@@ -37,14 +37,14 @@ public class MapMapper extends BaseMapper {
                     if (key != null) {
                         keyType = ClassInfo.forInstance(key);
                     }
-                    const keyMapper:AStreamMapper = registry.getMapper(keyType);
+                    const keyMapper:Mapper = registry.getMapper(keyType);
                     entryXML.appendChild(keyMapper.toXML(key, ref));
 
                     var valueType:ClassInfo;
                     if (value != null) {
                         valueType = ClassInfo.forInstance(value);
                     }
-                    const valueMapper:AStreamMapper = registry.getMapper(valueType);
+                    const valueMapper:Mapper = registry.getMapper(valueType);
                     entryXML.appendChild(valueMapper.toXML(value, ref));
 
                     xml.appendChild(entryXML);
@@ -60,11 +60,11 @@ public class MapMapper extends BaseMapper {
 
         for each (var entryXML:XML in xml.elements("entry")) {
             var keyXML:XML = entryXML.elements()[0];
-            var keyMapper:AStreamMapper = registry.getMapper(keyXML.localName());
+            var keyMapper:Mapper = registry.getMapper(keyXML.localName());
             var key:Object = keyMapper.fromXML(keyXML, ref);
 
             var valueXML:XML = entryXML.elements()[1];
-            var valueMapper:AStreamMapper = registry.getMapper(valueXML.localName());
+            var valueMapper:Mapper = registry.getMapper(valueXML.localName());
             var value:Object = valueMapper.fromXML(valueXML, ref);
 
             keys.push(key);

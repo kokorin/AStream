@@ -30,7 +30,7 @@ public class SequenceMapper extends BaseMapper {
         super.fillObject(instance, xml, deref);
         const sequence:Array = new Array();
         for each (var itemXML:XML in xml.elements()) {
-            var itemMapper:AStreamMapper = registry.getMapper(itemXML.localName());
+            var itemMapper:Mapper = registry.getMapper(itemXML.localName());
             var itemValue:Object = itemMapper.fromXML(itemXML, deref);
             sequence.push(itemValue);
         }
@@ -47,7 +47,7 @@ public class SequenceMapper extends BaseMapper {
                     if (itemValue) {
                         itemType = ClassInfo.forInstance(itemValue);
                     }
-                    const itemValueMapper:AStreamMapper = registry.getMapper(itemType);
+                    const itemValueMapper:Mapper = registry.getMapper(itemType);
                     const itemResult:XML = itemValueMapper.toXML(itemValue, ref);
                     xml.appendChild(itemResult);
                 }
