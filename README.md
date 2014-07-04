@@ -30,6 +30,9 @@ public class User {
     public var id:Number;
     [AStreamOrder(30)]
     public var role:UserRole;
+    [AStreamOrder(40)]
+    [AStreamConverter("ru.kokorin.astream.converter.DateConverter", params="yyyy-MM-dd")]
+    public var birth:Date;
 
     public function User() {
     }
@@ -44,7 +47,7 @@ public class User {
     }
 
     public function toString():String {
-        return "User{_name=" + String(_name) + ",id=" + String(id) + ",role=" + String(role) + "}";
+        return "User{name=" + String(name) + ",id=" + String(id) + ",role=" + String(role) + ",birth=" + String(birth) + "}";
     }
 }
 }
@@ -64,6 +67,7 @@ const user:User = new User();
 user.id = 1;
 user.name = "Ivanov Ivan";
 user.role = UserRole.ADMINISTRATOR;
+user.birth = new Date(1960, 4, 19, 0, 0, 0, 0);
 
 const xml:XML = aStream.toXML(user);
 /* xml.toXMLString()
@@ -71,11 +75,12 @@ const xml:XML = aStream.toXML(user);
     <id>1</id>
     <name>Ivanov Ivan</name>
     <role>ADMINISTRATOR</role>
+    <birth>1960-05-19</birth>
  </User> */
 
 const restoredUser:User = aStream.fromXML(xml) as User;
 /* restoredUser.toString()
-User{_name=Ivanov Ivan,id=1,role=ADMINISTRATOR} */
+User{name=Ivanov Ivan,id=1,role=ADMINISTRATOR,birth=Thu May 19 00:00:00 GMT+0300 1960} */
 ```        
 
 **Сorresponding types (by default)**
