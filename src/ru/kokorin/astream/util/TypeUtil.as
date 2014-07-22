@@ -25,7 +25,6 @@ import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
 public class TypeUtil {
-    private static const SIMPLE_TYPES:Array = [Boolean, int, uint, Number, String, Date, Enum];
     private static const MAP_CLASSES:Array = [
         ClassInfo.forClass(Object),
         ClassInfo.forClass(Dictionary),
@@ -35,18 +34,6 @@ public class TypeUtil {
     private static const IS_VECTOR_MAP:Map = new Map();
     private static const ITEM_TYPE_MAP:Map = new Map();
     private static const VECTOR_NAME_REGEXP:RegExp = /__AS3__\.vec::Vector\.<(.*)>/;
-
-    /** Checks if supplied type is simple or not.
-     *  Enums (subtypes of as3.lang.Enum) are considered to be simple.
-     * @param classInfo - type to check*/
-    public static function isSimple(classInfo:ClassInfo):Boolean {
-        for each (var clazz:Class in SIMPLE_TYPES) {
-            if (classInfo.isType(clazz)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     /** Checks if supplied type is a Map:
      *  Object, flash.utils.Dictionary, org.spicefactory.lib.collection.Map

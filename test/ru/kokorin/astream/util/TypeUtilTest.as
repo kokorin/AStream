@@ -19,19 +19,6 @@ import ru.kokorin.astream.valueobject.TestVO;
 
 [RunWith("org.flexunit.runners.Parameterized")]
 public class TypeUtilTest {
-    public static var IS_SIMPLE:Array = [
-        [Number,    true],
-        [int,       true],
-        [uint,      true],
-        [Boolean,   true],
-        [String,    true],
-        [TestVO,    false]
-    ];
-    [Test(dataProvider="IS_SIMPLE")]
-    public function testIsSimple(type:Class, isSimple:Boolean):void {
-        const info:ClassInfo = ClassInfo.forClass(type);
-        assertEquals("isSimple: " + info.name, TypeUtil.isSimple(info), isSimple);
-    }
 
     public static var IS_COLLECTION_AND_IS_MAP:Array = [
         [Array,             true, false],

@@ -74,7 +74,7 @@ public class AStreamMetadataProcessor {
                 }
                 break;
             }
-            if (TypeUtil.isSimple(classInfo) || processedClasses.indexOf(classInfo) != -1) {
+            if (processedClasses.indexOf(classInfo) != -1) {
                 break;
             }
 

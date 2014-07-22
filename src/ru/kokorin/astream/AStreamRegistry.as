@@ -319,7 +319,7 @@ public class AStreamRegistry {
     private function createMapper(classInfo:ClassInfo):Mapper {
         var result:Mapper;
 
-        if (classInfo == null || TypeUtil.isSimple(classInfo) || classInfo.isType(ByteArray)) {
+        if (classInfo == null || getConverter(classInfo) != null) {
             result = new SimpleMapper(classInfo);
         } else if (TypeUtil.isCollection(classInfo)) {
             result = new CollectionMapper(classInfo);
