@@ -25,7 +25,7 @@ public class MapMapperTest {
         original["number"] = 5;
         original["array"] = [new TestVO("First"), null, new TestVO("Third")];
 
-        const mapper:MapMapper = new MapMapper(ClassInfo.forClass(Object), registry);
+        const mapper:MapMapper = createMapMapper(ClassInfo.forClass(Object));
         const xml:XML = mapper.toXML(original, noRef);
         const restored:Object = mapper.fromXML(xml, noRef);
 
@@ -40,7 +40,7 @@ public class MapMapperTest {
         original[EnumVO.FIRST] = EnumVO.SECOND;
         original[new Object()] = [new TestVO("First"), null, new TestVO("Third")];
 
-        const mapper:MapMapper = new MapMapper(ClassInfo.forInstance(original), registry);
+        const mapper:MapMapper = createMapMapper(ClassInfo.forInstance(original));
         const xml:XML = mapper.toXML(original, noRef);
         const restored:Object = mapper.fromXML(xml, noRef);
 
@@ -55,11 +55,17 @@ public class MapMapperTest {
         original.put(EnumVO.FIRST, EnumVO.SECOND);
         original.put(new Object(), [new TestVO("First"), null, new TestVO("Third")]);
 
-        const mapper:MapMapper = new MapMapper(ClassInfo.forInstance(original), registry);
+        const mapper:MapMapper = createMapMapper(ClassInfo.forInstance(original));
         const xml:XML = mapper.toXML(original, noRef);
         const restored:Object = mapper.fromXML(xml, noRef);
 
         assertEquals(ObjectUtil.toString(original.toDictionary()), ObjectUtil.toString(restored.toDictionary()));
+    }
+
+    private function createMapMapper(classInfo:ClassInfo):MapMapper {
+        const result:MapMapper = new MapMapper(classInfo);
+        result.registry = registry;
+        return result;
     }
 }
 }

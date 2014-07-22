@@ -22,7 +22,8 @@ public class ExternalizableMapperTest {
         original.value3 = 0xABCDEF;
         original.value4 = null;
 
-        const complexMapper:ExternalizableMapper = new ExternalizableMapper(ClassInfo.forClass(ExtVO), registry);
+        const complexMapper:ExternalizableMapper = new ExternalizableMapper(ClassInfo.forClass(ExtVO));
+        complexMapper.registry = registry;
         const xml:XML = complexMapper.toXML(original, noRef);
         const restored:ExtVO = complexMapper.fromXML(xml, noRef) as ExtVO;
 

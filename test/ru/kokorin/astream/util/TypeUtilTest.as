@@ -8,6 +8,7 @@ import mx.collections.ArrayList;
 import org.flexunit.assertThat;
 
 import org.flexunit.asserts.assertEquals;
+import org.flexunit.asserts.assertFalse;
 import org.flexunit.asserts.assertTrue;
 import org.hamcrest.collection.array;
 import org.spicefactory.lib.collection.List;
@@ -49,7 +50,7 @@ public class TypeUtilTest {
         [Map,               false, true],
     ];
     [Test(dataProvider="IS_COLLECTION_AND_IS_MAP")]
-    public function testIsCollection(type:Class, isCollection:Boolean, isMap:Boolean, itemType:Class = null):void {
+    public function testIsCollectionAndIsMap(type:Class, isCollection:Boolean, isMap:Boolean, itemType:Class = null):void {
         const typeInfo:ClassInfo = ClassInfo.forClass(type);
         const instanceInfo:ClassInfo = ClassInfo.forInstance(new type());
 
@@ -63,14 +64,15 @@ public class TypeUtilTest {
     }
 
     private static const COLLECTION:Array = [1, true, "Test", new TestVO()];
-    public static var FOR_EACH_IN_COLLECTION:Array = [
+    public static var TYPE_AND_ITEMS:Array = [
         [Array,             COLLECTION],
         [List,              COLLECTION],
         [ArrayList,         COLLECTION],
         [ArrayCollection,   COLLECTION],
         [Vector.<Object>,   COLLECTION]
     ];
-    [Test(dataProvider="FOR_EACH_IN_COLLECTION")]
+
+    [Test(dataProvider="TYPE_AND_ITEMS")]
     public function testForEachInCollection(type:Class, items:Array):void {
         const collection:Object = new type();
         const copy:Array = new Array();
@@ -83,6 +85,22 @@ public class TypeUtilTest {
         );
 
         assertThat(copy, array(items));
+    }
+
+    [Test(dataProvider="TYPE_AND_ITEMS")]
+    public function testRemoveFromCollection(type:Class, items:Array):void {
+        const collection:Object = new type();
+
+        TypeUtil.addToCollection(collection, items);
+        TypeUtil.removeFromCollection(collection, items);
+
+        var hasItems:Boolean = false;
+        TypeUtil.forEachInCollection(collection,
+                function(item:Object, index:int, collection:Object) {
+                    hasItems = true;
+                }
+        );
+        assertFalse("There is item left in collection!", hasItems);
     }
 
     private static const KEYS:Array = COLLECTION;

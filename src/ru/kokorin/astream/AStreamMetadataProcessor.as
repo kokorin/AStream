@@ -18,6 +18,7 @@ package ru.kokorin.astream {
 import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Metadata;
 import org.spicefactory.lib.reflect.MetadataAware;
+import org.spicefactory.lib.reflect.Parameter;
 import org.spicefactory.lib.reflect.Property;
 
 import ru.kokorin.astream.converter.Converter;
@@ -27,6 +28,7 @@ import ru.kokorin.astream.metadata.AStreamAlias;
 import ru.kokorin.astream.metadata.AStreamAsAttribute;
 import ru.kokorin.astream.metadata.AStreamConverter;
 import ru.kokorin.astream.metadata.AStreamImplicit;
+import ru.kokorin.astream.metadata.AStreamMapper;
 import ru.kokorin.astream.metadata.AStreamOmitField;
 import ru.kokorin.astream.metadata.AStreamOrder;
 import ru.kokorin.astream.metadata.ArrayElementType;
@@ -43,6 +45,7 @@ public class AStreamMetadataProcessor {
         AStreamOmitField,
         AStreamImplicit,
         AStreamConverter,
+        AStreamMapper,
         AStreamOrder,
         ArrayElementType
     ];
@@ -74,10 +77,22 @@ public class AStreamMetadataProcessor {
             if (TypeUtil.isSimple(classInfo) || processedClasses.indexOf(classInfo) != -1) {
                 break;
             }
-            const alias:String = getAlias(classInfo);
-            if (alias) {
+
+            var alias:String = getAlias(classInfo);
+            if (alias != null) {
                 registry.alias(alias, classInfo);
             }
+
+            var converter:Converter = getConverter(classInfo);
+            if (converter != null) {
+                registry.registerConverter(converter, classInfo);
+            }
+
+            var mapper:Mapper = getMapper(classInfo);
+            if (mapper != null) {
+                registry.registerMapper(mapper, classInfo);
+            }
+
             processedClasses.push(classInfo);
 
             for each (var property:Property in classInfo.getProperties()) {
@@ -86,23 +101,6 @@ public class AStreamMetadataProcessor {
                 if (hasMetadata(property, AStreamOmitField)) {
                     registry.omit(classInfo, property.name);
                     continue;
-                }
-
-                var converterMeta:AStreamConverter = getMetadata(property, AStreamConverter) as AStreamConverter;
-                if (converterMeta != null) {
-                    var converterType:ClassInfo = ClassInfo.forName(converterMeta.converterType);
-                    var constructorArgs:Array;
-                    if (converterMeta.params != null) {
-                        constructorArgs = converterMeta.params.split(converterMeta.paramDelimiter);
-                    } else {
-                        constructorArgs = new Array();
-                    }
-                    var converter:Object = converterType.newInstance(constructorArgs);
-                    if (converter is Converter) {
-                        registry.registerConverterProperty(converter as Converter, classInfo, property.name);
-                    } else if (converter is Mapper) {
-                        registry.registerMapperProperty(converter as Mapper, classInfo, property.name);
-                    }
                 }
 
                 var propertyAlias:String = getAlias(property);
@@ -141,6 +139,16 @@ public class AStreamMetadataProcessor {
                     registry.implicit(classInfo, property.name, implicitMeta.itemName, implicitItemType, implicitMeta.keyProperty);
                 }
 
+                converter = getConverter(property);
+                if (converter != null) {
+                    registry.registerConverterForProperty(converter, classInfo, property.name);
+                }
+
+                mapper = getMapper(property);
+                if (mapper != null) {
+                    registry.registerMapperForProperty(mapper, classInfo, property.name);
+                }
+
             }
 
             classInfo = ClassInfo.forClass(classInfo.getSuperClass());
@@ -163,6 +171,45 @@ public class AStreamMetadataProcessor {
         const aliasMeta:AStreamAlias = getMetadata(metadataAware, AStreamAlias) as AStreamAlias;
         if (aliasMeta) {
             return aliasMeta.name;
+        }
+        return null;
+    }
+
+    private static function createObject(typeName:String, metadataAware:MetadataAware, params:String, paramDelimiter:String):Object {
+        const type:ClassInfo = ClassInfo.forName(typeName);
+        const parameters:Array = type.getConstructor().parameters;
+        const constructorArgs:Array = params != null ? params.split(paramDelimiter) : new Array();
+        if (parameters.length > 0) {
+            var firstParameter:Parameter = parameters[0] as Parameter;
+            if (firstParameter.type.getClass() == ClassInfo) {
+                var classInfo:ClassInfo = metadataAware as ClassInfo;
+                if (classInfo == null) {
+                    var property:Property = metadataAware as Property;
+                    if (property != null) {
+                        classInfo = property.type;
+                    }
+                }
+                constructorArgs.unshift(classInfo);
+            }
+        }
+
+        return type.newInstance(constructorArgs);
+    }
+
+    private static function getConverter(metadataAware:MetadataAware):Converter {
+        const converterMeta:AStreamConverter = getMetadata(metadataAware, AStreamConverter) as AStreamConverter;
+        if (converterMeta != null) {
+            return createObject(converterMeta.converterType, metadataAware,
+                                converterMeta.params, converterMeta.paramDelimiter) as Converter;
+        }
+        return null;
+    }
+
+    private static function getMapper(metadataAware:MetadataAware):Mapper {
+        const mapperMeta:AStreamMapper = getMetadata(metadataAware, AStreamMapper) as AStreamMapper;
+        if (mapperMeta != null) {
+            return createObject(mapperMeta.mapperType, metadataAware,
+                                mapperMeta.params, mapperMeta.paramDelimiter) as Mapper;
         }
         return null;
     }

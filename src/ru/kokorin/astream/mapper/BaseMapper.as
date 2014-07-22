@@ -25,10 +25,8 @@ public class BaseMapper implements Mapper {
     private var _registry:AStreamRegistry;
     private var nodeName:String;
 
-    public function BaseMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
+    public function BaseMapper(classInfo:ClassInfo) {
         this._classInfo = classInfo;
-        this._registry = registry;
-        reset();
     }
 
     public final function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML {
@@ -83,8 +81,13 @@ public class BaseMapper implements Mapper {
         return _classInfo;
     }
 
-    protected function get registry():AStreamRegistry {
+    public function get registry():AStreamRegistry {
         return _registry;
+    }
+
+    public function set registry(value:AStreamRegistry):void {
+        _registry = value;
+        reset();
     }
 
     public function reset():void {

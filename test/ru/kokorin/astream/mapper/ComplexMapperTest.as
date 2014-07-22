@@ -1,4 +1,6 @@
 package ru.kokorin.astream.mapper {
+import flash.geom.Point;
+
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
 import org.flexunit.asserts.assertTrue;
@@ -6,6 +8,7 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.converter.DateConverter;
+import ru.kokorin.astream.converter.PointConverter;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.valueobject.EnumVO;
@@ -22,7 +25,8 @@ public class ComplexMapperTest {
     public function setUp():void {
         registry = new AStreamRegistry();
         noRef = new NoRef();
-        complexMapper = new ComplexMapper(TEST_VO, registry);
+        complexMapper = new ComplexMapper(TEST_VO);
+        complexMapper.registry = registry;
 
         original = new TestVO("Root");
         original.enum = EnumVO.SECOND;
@@ -117,12 +121,11 @@ public class ComplexMapperTest {
         assertTrue("After reset we do have 'child' property", xmlAfterReset.elements("child")[0] !== undefined);
     }
 
-
     [Test]
     public function testConverter():void {
         registry.attribute(TEST_VO, "date");
-        registry.registerConverterProperty(new DateConverter("yyyy-MM-dd"), TEST_VO, "date");
-        registry.registerConverterProperty(new DateConverter("yyyy-MM-dd"), TEST_VO, "date2");
+        registry.registerConverterForProperty(new DateConverter("yyyy-MM-dd"), TEST_VO, "date");
+        registry.registerConverterForProperty(new DateConverter("yyyy-MM-dd"), TEST_VO, "date2");
         original.date = original.date2 = new Date(2013, 10, 13, 0, 0, 0, 0);
         original.value4 = new Date(2013, 10, 13, 14, 30, 10, 20);
 
@@ -133,6 +136,23 @@ public class ComplexMapperTest {
         assertEquals("Date in XML element", "2013-11-13", String(xml.date2));
         assertEquals("Date", String(original.date), String(restored.date));
         assertEquals("Date and time", String(original.value4), String(restored.value4));
+    }
+
+    [Test]
+    public function testNotSimplePropertyAsAttribute():void {
+        registry.registerConverterForProperty(new PointConverter(), TEST_VO, "point");
+        registry.attribute(TEST_VO, "point");
+        registry.attribute(TEST_VO, "point2");
+
+        original.point = new Point(10, 10);
+        original.point2 = new Point(-10, -10);
+
+        const xml:XML = complexMapper.toXML(original, noRef);
+        const restored:TestVO = complexMapper.fromXML(xml, noRef) as TestVO;
+
+        assertEquals("Point in XML attribute", "10,10", String(xml.@point));
+        assertEquals("Point as attribute", String(original.point), String(restored.point));
+        assertEquals("Point as element", String(original.point2), String(restored.point2));
     }
 }
 }

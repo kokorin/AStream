@@ -78,15 +78,16 @@ public class AStreamRegistry {
     public function registerConverter(converter:Converter, classInfo:ClassInfo):void {
         const classData:ClassData = getClassData(classInfo);
         classData.converter = converter;
-        classData.mapper = new SimpleMapper(classInfo, this, converter);
+        const mapper:Mapper = new SimpleMapper(classInfo);
+        registerMapper(mapper, classInfo);
     }
 
-    public function registerConverterProperty(converter:Converter, classInfo:ClassInfo, propertyName:String):void {
+    public function registerConverterForProperty(converter:Converter, classInfo:ClassInfo, propertyName:String):void {
         const classData:ClassData = getClassData(classInfo);
         const propertyData:PropertyData = classData.getPropertyData(propertyName);
-
         propertyData.converter = converter;
-        propertyData.mapper = new SimpleMapper(classInfo, this, converter);
+        const mapper:Mapper = new SimpleMapper(classInfo, propertyName);
+        registerMapperForProperty(mapper, classInfo, propertyName);
     }
 
     public function getConverter(classInfo:ClassInfo):Converter {
@@ -98,9 +99,12 @@ public class AStreamRegistry {
         return classData.converter;
     }
 
-    public function getConverterProperty(classInfo:ClassInfo, propertyName:String):Converter {
+    public function getConverterForProperty(classInfo:ClassInfo, propertyName:String):Converter {
+        if (propertyName == null) {
+            return getConverter(classInfo);
+        }
         const propertyData:PropertyData = getClassData(classInfo).getPropertyData(propertyName);
-        if (propertyData.converter) {
+        if (propertyData.converter != null) {
             return propertyData.converter;
         }
         const property:Property = classInfo.getProperty(propertyName);
@@ -113,11 +117,13 @@ public class AStreamRegistry {
     public function registerMapper(mapper:Mapper, classInfo:ClassInfo):void {
         const classData:ClassData = getClassData(classInfo);
         classData.mapper = mapper;
+        mapper.registry = this;
     }
 
-    public function registerMapperProperty(mapper:Mapper, classInfo:ClassInfo, propertyName:String):void {
+    public function registerMapperForProperty(mapper:Mapper, classInfo:ClassInfo, propertyName:String):void {
         const propertyData:PropertyData = getClassData(classInfo).getPropertyData(propertyName);
         propertyData.mapper = mapper;
+        mapper.registry = this;
     }
 
     public function getMapper(nameOrClassInfo:Object):Mapper {
@@ -133,7 +139,7 @@ public class AStreamRegistry {
         return classData.mapper;
     }
 
-    public function getMapperProperty(classInfo:ClassInfo, propertyName:String):Mapper {
+    public function getMapperForProperty(classInfo:ClassInfo, propertyName:String):Mapper {
         const classData:ClassData = getClassData(classInfo);
         const propertyData:PropertyData = classData.getPropertyData(propertyName);
         if (propertyData.mapper) {
@@ -235,7 +241,7 @@ public class AStreamRegistry {
     public function aliasProperty(name:String, classInfo:ClassInfo, propertyName:String):void {
         getClassData(classInfo).getPropertyData(propertyName).alias = name;
     }
-    public function getAliasProperty(classInfo:ClassInfo, propertyName:String):String {
+    public function getPropertyAlias(classInfo:ClassInfo, propertyName:String):String {
         var result:String = getClassData(classInfo).getPropertyData(propertyName).alias;
         if (result == null) {
             result = propertyName;
@@ -292,7 +298,7 @@ public class AStreamRegistry {
     }
 
     private function createConverter(classInfo:ClassInfo):Converter {
-        if (classInfo) {
+        if (classInfo != null) {
             if (classInfo.isType(Boolean)) {
                 return new BooleanConverter();
             } else if (classInfo.isType(Date)) {
@@ -311,19 +317,22 @@ public class AStreamRegistry {
     }
 
     private function createMapper(classInfo:ClassInfo):Mapper {
+        var result:Mapper;
+
         if (classInfo == null || TypeUtil.isSimple(classInfo) || classInfo.isType(ByteArray)) {
-            return new SimpleMapper(classInfo, this);
+            result = new SimpleMapper(classInfo);
+        } else if (TypeUtil.isCollection(classInfo)) {
+            result = new CollectionMapper(classInfo);
+        } else if (TypeUtil.isMap(classInfo)) {
+            result = new MapMapper(classInfo);
+        } else if (classInfo.isType(IExternalizable)) {
+            result = new ExternalizableMapper(classInfo);
+        } else {
+            result = new ComplexMapper(classInfo);
         }
-        if (TypeUtil.isCollection(classInfo)) {
-            return new CollectionMapper(classInfo, this);
-        }
-        if (TypeUtil.isMap(classInfo)) {
-            return new MapMapper(classInfo, this);
-        }
-        if (classInfo.isType(IExternalizable)) {
-            return new ExternalizableMapper(classInfo, this);
-        }
-        return new ComplexMapper(classInfo, this);
+        result.registry = this;
+
+        return result;
     }
 
     private function getClassData(classInfo:ClassInfo):ClassData {

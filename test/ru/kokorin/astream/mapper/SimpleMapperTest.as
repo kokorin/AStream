@@ -35,7 +35,8 @@ public class SimpleMapperTest {
     [Test(dataProvider="TYPE_VALUE_PAIRS")]
     public function test(type:Class, value:Object):void {
         const info:ClassInfo = ClassInfo.forClass(type);
-        const simpleMapper:SimpleMapper = new SimpleMapper(info, registry);
+        const simpleMapper:SimpleMapper = createSimpleMapper(info);
+
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Object = simpleMapper.fromXML(xml, null);
 
@@ -45,7 +46,8 @@ public class SimpleMapperTest {
     [Test]
     public function testDate():void {
         const value:Date = new Date();
-        const simpleMapper:SimpleMapper = new SimpleMapper(DATE_CLASS, registry);
+        const simpleMapper:SimpleMapper = createSimpleMapper(DATE_CLASS);
+
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Date = simpleMapper.fromXML(xml, null) as Date;
 
@@ -56,7 +58,9 @@ public class SimpleMapperTest {
     public function testDateConverter():void {
         const value:Date = new Date(2013, 10, 13, 0, 0, 0, 0);
         const converter:Converter = new DateConverter("yyyy-MM-dd");
-        const simpleMapper:SimpleMapper = new SimpleMapper(DATE_CLASS, registry, converter);
+        registry.registerConverter(converter, DATE_CLASS);
+        const simpleMapper:SimpleMapper = createSimpleMapper(DATE_CLASS);
+
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:Date = simpleMapper.fromXML(xml, null) as Date;
 
@@ -72,7 +76,8 @@ public class SimpleMapperTest {
     ];
     [Test(dataProvider="ESCAPE_PAIRS")]
     public function testEscape(value:String, xmlText:String):void {
-        const simpleMapper:SimpleMapper = new SimpleMapper(STRING_CLASS, registry);
+        const simpleMapper:SimpleMapper = createSimpleMapper(STRING_CLASS);
+
         const xml:XML = simpleMapper.toXML(value, null);
         const restored:String = simpleMapper.fromXML(xml, null) as String;
 
@@ -85,10 +90,11 @@ public class SimpleMapperTest {
     ];
     [Test(dataProvider="TEXT_ENCODED_PAIRS")]
     public function testByteArray(text:String, encoded:String):void {
-        const simpleMapper:SimpleMapper = new SimpleMapper(BYTEARRAY_CLASS, registry);
-        const bytes:ByteArray = new ByteArray();
-        bytes.writeUTFBytes(text);
-        const xml:XML = simpleMapper.toXML(bytes, null);
+        const value:ByteArray = new ByteArray();
+        value.writeUTFBytes(text);
+        const simpleMapper:SimpleMapper = createSimpleMapper(BYTEARRAY_CLASS);
+
+        const xml:XML = simpleMapper.toXML(value, null);
         const restored:ByteArray = simpleMapper.fromXML(xml, null) as ByteArray;
 
         assertEquals("Wrong Base64 encoding", String(xml), encoded);
@@ -98,7 +104,8 @@ public class SimpleMapperTest {
 
     [Test]
     public function testReset():void {
-        const simpleMapper:SimpleMapper = new SimpleMapper(STRING_CLASS, registry);
+        const simpleMapper:SimpleMapper = createSimpleMapper(STRING_CLASS);
+
         const xmlBeforeAlias:XML = simpleMapper.toXML("", null);
         registry.alias("string", STRING_CLASS);
         const xmlAfterAlias:XML = simpleMapper.toXML("", null);
@@ -107,6 +114,12 @@ public class SimpleMapperTest {
 
         assertEquals("Tag names before reset", xmlBeforeAlias.localName(), xmlAfterAlias.localName());
         assertEquals("Tag name after reset", "string", xmlAfterReset.localName());
+    }
+
+    private function createSimpleMapper(classInfo:ClassInfo):SimpleMapper {
+        const result:SimpleMapper = new SimpleMapper(classInfo);
+        result.registry = registry;
+        return result;
     }
 }
 }

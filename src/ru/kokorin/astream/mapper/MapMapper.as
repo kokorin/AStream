@@ -22,8 +22,8 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class MapMapper extends BaseMapper {
-    public function MapMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
-        super(classInfo, registry);
+    public function MapMapper(classInfo:ClassInfo) {
+        super(classInfo);
     }
 
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {

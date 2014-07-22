@@ -34,7 +34,8 @@ public class CollectionMapperTest {
         const info:ClassInfo = ClassInfo.forClass(type);
         const values:Object = info.newInstance([]);
         TypeUtil.addToCollection(values, items);
-        const collectionMapper:CollectionMapper = new CollectionMapper(info, registry);
+        const collectionMapper:CollectionMapper = new CollectionMapper(info);
+        collectionMapper.registry = registry;
 
         const xml:XML = collectionMapper.toXML(values, noRef);
         const restored:Object = collectionMapper.fromXML(xml, noRef);

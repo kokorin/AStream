@@ -126,9 +126,48 @@ public class TypeUtil {
         }
     }
 
+    public static function removeFromCollection(collection:Object, items:Array):void {
+        if (collection == null || items == null || items.length == 0) {
+            return;
+        }
+        const collectionInfo:ClassInfo = ClassInfo.forInstance(collection);
+        var item:Object;
+        var itemIndex:int;
+        if (collectionInfo.isType(Array)) {
+            const array:Array = collection as Array;
+            for each (item in items) {
+                itemIndex = array.indexOf(item);
+                if (itemIndex != -1) {
+                    array.splice(itemIndex, 1);
+                }
+            }
+        } else if (collectionInfo.isType(List)) {
+            const list:List = collection as List;
+            for each (item in items) {
+                if (list.contains(item)) {
+                    list.remove(item);
+                }
+            }
+        } else if (isList(collectionInfo)) {
+            for each (item in items) {
+                itemIndex = collection.getItemIndex(item);
+                if (itemIndex != -1) {
+                    collection.removeItemAt(itemIndex);
+                }
+            }
+        } else if (isVector(collectionInfo)) {
+            for each (item in items) {
+                itemIndex = collection.indexOf(item);
+                if (itemIndex != -1) {
+                    collection.splice(itemIndex, 1);
+                }
+            }
+        }
+    }
+
     /**
-     * @param collection:Object — collection to iterate through
-     * @param callback:Function — The function to run on each item in the array.
+     * @param collection — collection to iterate through
+     * @param callback — The function to run on each item in the array.
      * This function is invoked with three arguments:
         function callback(item:*, index:int, collection:Object):void;
      */
@@ -169,8 +208,8 @@ public class TypeUtil {
         }
     }
     /**
-     * @param map:Object — map to iterate through
-     * @param callback:Function — The function to run on each item in the array.
+     * @param map — map to iterate through
+     * @param callback — The function to run on each item in the array.
      * This function is invoked with three arguments:
         function callback(item:*, key:*, map:Object):void;
      */

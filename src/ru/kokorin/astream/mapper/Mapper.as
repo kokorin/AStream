@@ -15,11 +15,17 @@
  */
 
 package ru.kokorin.astream.mapper {
+import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
 
 public interface Mapper {
     function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML;
+
     function fromXML(xml:XML, ref:AStreamRef):Object;
+
+    function set registry(value:AStreamRegistry):void;
+
+    function get registry():AStreamRegistry;
 
     function reset():void;
 }

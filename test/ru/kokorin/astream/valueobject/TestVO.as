@@ -1,4 +1,5 @@
 package ru.kokorin.astream.valueobject {
+import flash.geom.Point;
 import flash.utils.getQualifiedClassName;
 
 public class TestVO {
@@ -12,6 +13,8 @@ public class TestVO {
     public var value4:Object;
     public var checked:Boolean;
     public var children:Array;
+    public var point:Point;
+    public var point2:Point;
 
     public function TestVO(name:String = null) {
         this.name = name;
@@ -44,6 +47,13 @@ public class TestVO {
         if (children != null) {
             result.push("children="+children);
         }
+        if (point != null) {
+            result.push("point="+point);
+        }
+        if (point2 != null) {
+            result.push("point2="+point2);
+        }
+
         const clazzName:String = getQualifiedClassName(this).split(".").reverse()[0];
         return clazzName + "{" + result.join(", ") + "}";
     }

@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package ru.kokorin.astream.mapper {
-import org.spicefactory.lib.reflect.ClassInfo;
+package ru.kokorin.astream.mapper.handler {
+import ru.kokorin.astream.ref.AStreamRef;
 
-import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.util.TypeUtil;
+public interface PropertyHandler {
+    function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void;
 
-public class CollectionMapper extends SequenceMapper {
+    function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void ;
 
-    public function CollectionMapper(classInfo:ClassInfo) {
-        super(classInfo);
-    }
+    function get nodeName():String;
 
-    override protected function setSequence(instance:Object, sequence:Array):void {
-        TypeUtil.addToCollection(instance, sequence);
-    }
-
-    override protected function getSequence(instance:Object):Object {
-        return instance;
-    }
+    function get nodeType():NodeType;
 }
 }

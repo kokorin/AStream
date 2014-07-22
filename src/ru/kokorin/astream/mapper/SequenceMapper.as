@@ -22,8 +22,8 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class SequenceMapper extends BaseMapper {
-    public function SequenceMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
-        super(classInfo, registry);
+    public function SequenceMapper(classInfo:ClassInfo) {
+        super(classInfo);
     }
 
     override protected function fillObject(instance:Object, xml:XML, deref:AStreamRef):void {
@@ -44,7 +44,7 @@ public class SequenceMapper extends BaseMapper {
         TypeUtil.forEachInCollection(sequence,
                 function (itemValue:Object, i:int, collection:Object):void {
                     var itemType:ClassInfo;
-                    if (itemValue) {
+                    if (itemValue != null) {
                         itemType = ClassInfo.forInstance(itemValue);
                     }
                     const itemValueMapper:Mapper = registry.getMapper(itemType);

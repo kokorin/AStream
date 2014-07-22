@@ -23,18 +23,14 @@ import ru.kokorin.astream.ref.AStreamRef;
 
 public class SimpleMapper implements Mapper {
     private var classInfo:ClassInfo;
-    private var registry:AStreamRegistry;
-    private var nodeName:String;
+    private var propertyName:String;
     private var converter:Converter;
+    private var nodeName:String;
+    private var _registry:AStreamRegistry;
 
-    public function SimpleMapper(classInfo:ClassInfo, registry:AStreamRegistry, converter:Converter = null) {
+    public function SimpleMapper(classInfo:ClassInfo, propertyName:String = null) {
         this.classInfo = classInfo;
-        this.registry = registry;
-        if (converter == null) {
-            converter = registry.getConverter(classInfo);
-        }
-        this.converter = converter;
-        reset();
+        this.propertyName = propertyName;
     }
 
     public function fromXML(xml:XML, ref:AStreamRef):Object {
@@ -56,8 +52,18 @@ public class SimpleMapper implements Mapper {
         return result;
     }
 
+    public function get registry():AStreamRegistry {
+        return _registry;
+    }
+
+    public function set registry(value:AStreamRegistry):void {
+        _registry = value;
+        reset();
+    }
+
     public function reset():void {
         nodeName = registry.getAlias(classInfo);
+        converter = registry.getConverterForProperty(classInfo, propertyName);
     }
 }
 }

@@ -8,5 +8,6 @@ public class MapperSuite {
     public var externalizableMapper:ExternalizableMapperTest;
     public var mapMapperTest:MapMapperTest;
     public var complexMapperTest:ComplexMapperTest;
+    public var textNodeMapperTest:TextNodeMapperTest;
 }
 }

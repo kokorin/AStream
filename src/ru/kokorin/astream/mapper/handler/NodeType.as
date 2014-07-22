@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package ru.kokorin.astream.mapper {
-import org.spicefactory.lib.reflect.ClassInfo;
+package ru.kokorin.astream.mapper.handler {
+import as3.lang.Enum;
 
-import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.util.TypeUtil;
+public class NodeType extends Enum {
+    public static const TEXT:NodeType = new NodeType("text");
+    public static const ELEMENT:NodeType = new NodeType("element");
+    public static const ATTRIBUTE:NodeType = new NodeType("attribute");
 
-public class CollectionMapper extends SequenceMapper {
-
-    public function CollectionMapper(classInfo:ClassInfo) {
-        super(classInfo);
-    }
-
-    override protected function setSequence(instance:Object, sequence:Array):void {
-        TypeUtil.addToCollection(instance, sequence);
-    }
-
-    override protected function getSequence(instance:Object):Object {
-        return instance;
+    public function NodeType(name:String) {
+        super(name);
     }
 }
 }

@@ -23,8 +23,8 @@ import ru.kokorin.astream.AStreamRegistry;
 
 public class ExternalizableMapper extends SequenceMapper {
 
-    public function ExternalizableMapper(classInfo:ClassInfo, registry:AStreamRegistry) {
-        super(classInfo, registry);
+    public function ExternalizableMapper(classInfo:ClassInfo) {
+        super(classInfo);
     }
 
     override protected function setSequence(instance:Object, sequence:Array):void {

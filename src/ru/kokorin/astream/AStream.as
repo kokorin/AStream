@@ -64,14 +64,31 @@ public class AStream {
         }
     }
 
-    public function processMetadata(clazz:Class):void {
-        const classInfo:ClassInfo = ClassInfo.forClass(clazz);
-        registry.processMetadata(classInfo);
+    public function processMetadata(classOrArray:Object):void {
+        if (classOrArray is Class) {
+            classOrArray = [classOrArray];
+        }
+        for each (var clazz:Class in classOrArray) {
+            var classInfo:ClassInfo = ClassInfo.forClass(clazz);
+            registry.processMetadata(classInfo);
+        }
         needReset = true;
     }
 
-    public function registerConverter(clazz:Class, converter:Converter):void {
+    public function registerConverter(converter:Converter, clazz:Class):void {
+        registry.registerConverter(converter, ClassInfo.forClass(clazz));
+    }
 
+    public function registerConverterForProperty(converter:Converter, clazz:Class, propertyName:String):void {
+        registry.registerConverterForProperty(converter, ClassInfo.forClass(clazz), propertyName);
+    }
+
+    public function registerMapper(mapper:Mapper, clazz:Class):void {
+        registry.registerMapper(mapper, ClassInfo.forClass(clazz));
+    }
+
+    public function registerMapperForProperty(mapper:Mapper, clazz:Class, propertyName:String):void {
+        registry.registerMapperForProperty(mapper, ClassInfo.forClass(clazz), propertyName);
     }
 
     public function alias(name:String, clazz:Class):void {
