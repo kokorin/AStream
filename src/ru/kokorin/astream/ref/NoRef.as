@@ -44,6 +44,11 @@ public class NoRef extends BaseRef implements AStreamRef {
         return null;
     }
 
+    override public function clear():void {
+        super.clear();
+        pathMap.removeAll();
+    }
+
     private static function isParentPath(path:Array, parentPath:Array):Boolean {
         if (path.length > parentPath.length) {
             return false;

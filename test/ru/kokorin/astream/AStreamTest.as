@@ -1,6 +1,9 @@
 package ru.kokorin.astream {
 import flash.utils.Dictionary;
 
+import mx.collections.ArrayCollection;
+import mx.collections.ArrayList;
+
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
@@ -8,6 +11,8 @@ import org.flexunit.asserts.assertNull;
 import org.flexunit.asserts.assertTrue;
 import org.hamcrest.collection.arrayWithSize;
 import org.spicefactory.lib.reflect.ClassInfo;
+
+import ru.kokorin.astream.metadata.AStreamMapper;
 
 import ru.kokorin.astream.valueobject.EnumVO;
 
