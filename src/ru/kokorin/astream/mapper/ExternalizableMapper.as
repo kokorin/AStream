@@ -21,6 +21,10 @@ import org.spicefactory.lib.reflect.ClassInfo;
 
 import ru.kokorin.astream.AStreamRegistry;
 
+/**
+ * Maps objects that extend IExternalizable interface.
+ * @see flash.utils.IExternalizable
+ */
 public class ExternalizableMapper extends SequenceMapper {
 
     public function ExternalizableMapper(classInfo:ClassInfo) {

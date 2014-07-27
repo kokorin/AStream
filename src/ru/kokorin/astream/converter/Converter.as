@@ -15,6 +15,10 @@
  */
 
 package ru.kokorin.astream.converter {
+/**
+ * An interface describing conversion of typed object
+ * to string representation and back
+ */
 public interface Converter {
     function fromString(string:String):Object;
     function toString(value:Object):String;

@@ -15,48 +15,178 @@
  */
 
 package ru.kokorin.astream.util {
+/**
+ * Date and Time Patterns
+ * <p>
+ * Date and time formats are specified by date and time pattern
+ * strings.
+ * Within date and time pattern strings, unquoted letters from
+ * <code>'A'</code> to <code>'Z'</code> and from <code>'a'</code> to
+ * <code>'z'</code> are interpreted as pattern letters representing the
+ * components of a date or time string.
+ * Text can be quoted using single quotes (<code>'</code>) to avoid
+ * interpretation.
+ * <code>''</code> represents a single quote.
+ * All other characters are not interpreted; they're simply copied into the
+ * output string during formatting or matched against the input string
+ * during parsing.
+ * <p>
+ * The following pattern letters are defined (all other characters from
+ * <code>'A'</code> to <code>'Z'</code> and from <code>'a'</code> to
+ * <code>'z'</code> are reserved):
+ * <table border=0 cellspacing=3 cellpadding=0 summary="Chart shows pattern letters, date/time component, presentation, and examples.">
+ *     <tr bgcolor="#ccccff">
+ *         <th align=left>Letter
+ *         <th align=left>Date or Time Component
+ *         <th align=left>Presentation
+ *         <th align=left>Examples
+ *     <tr>
+ *         <td><code>G</code>
+ *         <td>Era designator
+ *         <td>Text
+ *         <td><code>AD</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>y</code>
+ *         <td>Year
+ *         <td>Year
+ *         <td><code>1996</code>; <code>96</code>
+ *     <tr>
+ *         <td><code>M</code>
+ *         <td>Month in year
+ *         <td>Month
+ *         <td><code>July</code>; <code>Jul</code>; <code>07</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>w</code>
+ *         <td>Week in year
+ *         <td>UNSUPPORTED
+ *         <td><code>27</code>
+ *     <tr>
+ *         <td><code>W</code>
+ *         <td>Week in month
+ *         <td>UNSUPPORTED
+ *         <td><code>2</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>D</code>
+ *         <td>Day in year
+ *         <td>UNSUPPORTED
+ *         <td><code>189</code>
+ *     <tr>
+ *         <td><code>d</code>
+ *         <td>Day in month
+ *         <td>Number
+ *         <td><code>10</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>F</code>
+ *         <td>Day of week in month
+ *         <td>UNSUPPORTED
+ *         <td><code>2</code>
+ *     <tr>
+ *         <td><code>E</code>
+ *         <td>Day in week
+ *         <td>Text
+ *         <td><code>Tuesday</code>; <code>Tue</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>a</code>
+ *         <td>Am/pm marker
+ *         <td>Text
+ *         <td><code>PM</code>
+ *     <tr>
+ *         <td><code>H</code>
+ *         <td>Hour in day (0-23)
+ *         <td>Number
+ *         <td><code>0</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>k</code>
+ *         <td>Hour in day (1-24)
+ *         <td>Number
+ *         <td><code>24</code>
+ *     <tr>
+ *         <td><code>K</code>
+ *         <td>Hour in am/pm (0-11)
+ *         <td>Number
+ *         <td><code>0</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>h</code>
+ *         <td>Hour in am/pm (1-12)
+ *         <td>Number
+ *         <td><code>12</code>
+ *     <tr>
+ *         <td><code>m</code>
+ *         <td>Minute in hour
+ *         <td>Number
+ *         <td><code>30</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>s</code>
+ *         <td>Second in minute
+ *         <td>Number
+ *         <td><code>55</code>
+ *     <tr>
+ *         <td><code>S</code>
+ *         <td>Millisecond
+ *         <td>Number
+ *         <td><code>978</code>
+ *     <tr bgcolor="#eeeeff">
+ *         <td><code>z</code>
+ *         <td>Time zone
+ *         <td>General time zone
+ *         <td><code>Pacific Standard Time</code>; <code>PST</code>; <code>GMT-08:00</code>
+ *     <tr>
+ *         <td><code>Z</code>
+ *         <td>Time zone
+ *         <td>RFC 822 time zone
+ *         <td><code>-0800</code>
+ * </table>
+ */
 public class SimpleDateFormat {
     private static const QUOTE_CHAR:String = "\'";
     private static const PATTERN_CHARS:String = "GyMdkHmsSEDFwWahKzZYuX";
 
-    private static const PATTERN_ERA:String                  = "G"; // 0; // G
-    private static const PATTERN_YEAR:String                 = "y"; // 1; // y
-    private static const PATTERN_MONTH:String                = "M"; // 2; // M
-    private static const PATTERN_DAY_OF_MONTH:String         = "d"; // 3; // d
-    private static const PATTERN_HOUR_OF_DAY1:String         = "k"; // 4; // k
-    private static const PATTERN_HOUR_OF_DAY0:String         = "H"; // 5; // H
-    private static const PATTERN_MINUTE:String               = "m"; // 6; // m
-    private static const PATTERN_SECOND:String               = "s"; // 7; // s
-    private static const PATTERN_MILLISECOND:String          = "S"; // 8; // S
-    private static const PATTERN_DAY_OF_WEEK:String          = "E"; // 9; // E
-    private static const PATTERN_DAY_OF_YEAR:String          = "D"; //10; // D
-    private static const PATTERN_DAY_OF_WEEK_IN_MONTH:String = "F"; //11; // F
-    private static const PATTERN_WEEK_OF_YEAR:String         = "w"; //12; // w
-    private static const PATTERN_WEEK_OF_MONTH:String        = "W"; //13; // W
-    private static const PATTERN_AM_PM:String                = "a"; //14; // a
-    private static const PATTERN_HOUR1:String                = "h"; //15; // h
-    private static const PATTERN_HOUR0:String                = "K"; //16; // K
-    private static const PATTERN_ZONE_NAME:String            = "z"; //17; // z
-    private static const PATTERN_ZONE_VALUE:String           = "Z"; //18; // Z
-    private static const PATTERN_WEEK_YEAR:String            = "Y"; //19; // Y
-    private static const PATTERN_ISO_DAY_OF_WEEK:String      = "u"; //20; // u
-    private static const PATTERN_ISO_ZONE:String             = "X"; //21; // X
+    private static const PATTERN_ERA:String = "G";
+    private static const PATTERN_YEAR:String = "y";
+    private static const PATTERN_MONTH:String = "M";
+    private static const PATTERN_DAY_OF_MONTH:String = "d";
+    private static const PATTERN_HOUR_OF_DAY1:String = "k";
+    private static const PATTERN_HOUR_OF_DAY0:String = "H";
+    private static const PATTERN_MINUTE:String = "m";
+    private static const PATTERN_SECOND:String = "s";
+    private static const PATTERN_MILLISECOND:String = "S";
+    private static const PATTERN_DAY_OF_WEEK:String = "E";
+    private static const PATTERN_DAY_OF_YEAR:String = "D";
+    private static const PATTERN_DAY_OF_WEEK_IN_MONTH:String = "F";
+    private static const PATTERN_WEEK_OF_YEAR:String = "w";
+    private static const PATTERN_WEEK_OF_MONTH:String = "W";
+    private static const PATTERN_AM_PM:String = "a";
+    private static const PATTERN_HOUR1:String = "h";
+    private static const PATTERN_HOUR0:String = "K";
+    private static const PATTERN_ZONE_NAME:String = "z";
+    private static const PATTERN_ZONE_VALUE:String = "Z";
+    private static const PATTERN_WEEK_YEAR:String = "Y";
+    private static const PATTERN_ISO_DAY_OF_WEEK:String = "u";
+    private static const PATTERN_ISO_ZONE:String = "X";
+    /* This constants only used in formatting. We have to designate that our format
+     * has ERA symbol, so that negative years (BC) are printed without minus sign
+     * Example: "d MMM y G" corresponds to "1 Jan 7 BC" and NOT to "1 Jan -7 BC"
+     * This format string will never be produced by compile function.
+     * PATTERN_WEEK_YEAR, PATTERN_YEAR and PATTERN_ERA will be processed separately */
+    private static const PATTERN_YEAR_WITH_ERA:String = PATTERN_YEAR + PATTERN_ERA;
+    private static const PATTERN_WEEK_YEAR_WITH_ERA:String = PATTERN_WEEK_YEAR + PATTERN_ERA;
+
 
     private static const CENTURY_START_YEAR:int = (new Date()).fullYear - 80;
 
     //TODO try to use ResourceManager.getInstance().getStringArray("SharedResources", "monthNames");
     private static const ERAS:Array = ["BC", "AD"];
     private static const AM_PM:Array = ["AM", "PM"];
-    private static const MONTHS:Array = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    private static const SHORT_MONTHS:Array = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-    private static const DAYS:Array = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-    private static const SHORT_DAYS:Array = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    private static const MONTHS:Array = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    private static const SHORT_MONTHS:Array = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    private static const DAYS:Array = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    private static const SHORT_DAYS:Array = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     private static const TIMEZONE_INFO:Array = [
         ["Alpha Time Zone", "A", "+0100"],
         ["Australian Central Daylight Time", "ACDT", "+1030"],
         ["Australian Central Standard Time", "ACST", "+0930"],
-        ["Atlantic Daylight Time","ADT", "-0300"],
+        ["Atlantic Daylight Time", "ADT", "-0300"],
         ["Atlantic Daylight Time", "ADT", "-0300"],
         ["Australian Eastern Daylight Time", "AEDT", "+1100"],
         ["Australian Eastern Standard Time", "AEST", "+1000"],
@@ -316,9 +446,8 @@ public class SimpleDateFormat {
             if (part != null) {
                 var obeyCount:Boolean = false;
                 //If the next part comes without delimiter we should obey digit count
-                if ((i+1) < compiledPattern.length &&
-                        compiledPattern[i+1] is CompiledPart)
-                {
+                if ((i + 1) < compiledPattern.length &&
+                        compiledPattern[i + 1] is CompiledPart) {
                     obeyCount = true;
                 }
                 start = subParse(text, start, part.char, part.count, obeyCount, dateBuilder);
@@ -340,10 +469,9 @@ public class SimpleDateFormat {
             digits = count;
         } else {
             while (true) {
-                char = text.charAt(start+digits);
+                char = text.charAt(start + digits);
                 if (char >= "0" && char <= "9" ||
-                        (char == "-" || char == "+") && digits == 0)
-                {
+                        (char == "-" || char == "+") && digits == 0) {
                     digits++;
                 } else {
                     break;
@@ -357,7 +485,8 @@ public class SimpleDateFormat {
 
         var newStart:int;
         switch (formatChar) {
-            case PATTERN_ERA: {
+            case PATTERN_ERA:
+            {
                 newStart = matchString(text, start, ERAS,
                         function (value:String, index:int):void {
                             dateBuilder.setEra(value);
@@ -367,17 +496,26 @@ public class SimpleDateFormat {
                 }
                 break;
             }
+            case PATTERN_WEEK_YEAR_WITH_ERA:
+            case PATTERN_YEAR_WITH_ERA:
+            {
+                //If format contains Era we can't convert two digit years to this century
+                dateBuilder.setYear(value);
+                break;
+            }
             case PATTERN_WEEK_YEAR:
-            case PATTERN_YEAR: {
+            case PATTERN_YEAR:
+            {
                 if (count <= 2 && digits == 2) {
                     var ambiguousTwoDigitYear:int = CENTURY_START_YEAR % 100;
-                    value += int(CENTURY_START_YEAR/100)*100 +
+                    value += int(CENTURY_START_YEAR / 100) * 100 +
                             (value < ambiguousTwoDigitYear ? 100 : 0);
                 }
                 dateBuilder.setYear(value);
                 break;
             }
-            case PATTERN_MONTH: {
+            case PATTERN_MONTH:
+            {
                 if (count <= 2) {
                     dateBuilder.setMonth(value - 1);
                 } else {
@@ -394,18 +532,21 @@ public class SimpleDateFormat {
                 }
                 break;
             }
-            case PATTERN_DAY_OF_MONTH: {
+            case PATTERN_DAY_OF_MONTH:
+            {
                 dateBuilder.setDay(value);
                 break;
             }
-            case PATTERN_HOUR1: {              // 'K' 0-based.  eg, 11PM + 1 hour =>> 0 AM
+            case PATTERN_HOUR1:
+            {              // 'K' 0-based.  eg, 11PM + 1 hour =>> 0 AM
                 if (value == 12) {
                     value = 0;
                 }
                 dateBuilder.setHour(value);
                 break;
             }
-            case PATTERN_HOUR_OF_DAY1: {       // 'H' 0-based.  eg, 23:59 + 1 hour =>> 00:59
+            case PATTERN_HOUR_OF_DAY1:
+            {       // 'H' 0-based.  eg, 23:59 + 1 hour =>> 00:59
                 if (value == 24) {
                     value = 0;
                 }
@@ -413,11 +554,13 @@ public class SimpleDateFormat {
                 break;
             }
             case PATTERN_HOUR_OF_DAY0:
-            case PATTERN_HOUR0: {
+            case PATTERN_HOUR0:
+            {
                 dateBuilder.setHour(value);
                 break;
             }
-            case PATTERN_AM_PM: {
+            case PATTERN_AM_PM:
+            {
                 newStart = matchString(text, start, AM_PM,
                         function (value:String, index:int):void {
                             dateBuilder.setAmPm(value);
@@ -428,19 +571,23 @@ public class SimpleDateFormat {
                 }
                 break;
             }
-            case PATTERN_MINUTE: {
+            case PATTERN_MINUTE:
+            {
                 dateBuilder.setMinute(value);
                 break;
             }
-            case PATTERN_SECOND: {
+            case PATTERN_SECOND:
+            {
                 dateBuilder.setSecond(value);
                 break;
             }
-            case PATTERN_MILLISECOND: {
+            case PATTERN_MILLISECOND:
+            {
                 dateBuilder.setMilliSecond(value);
                 break;
             }
-            case PATTERN_DAY_OF_WEEK: {
+            case PATTERN_DAY_OF_WEEK:
+            {
                 //Ignore day of week. Parse it to find next start.
                 newStart = matchString(text, start, DAYS, null);
                 if (newStart < 0) {
@@ -451,18 +598,19 @@ public class SimpleDateFormat {
                 }
                 break;
             }
-            case PATTERN_ZONE_NAME: {
+            case PATTERN_ZONE_NAME:
+            {
                 var isGMT:Boolean = false;
                 newStart = matchString(text, start, TIMEZONES, setTimezoneOffset);
                 if (newStart < 0) {
                     newStart = matchString(text, start, SHORT_TIMEZONES, setTimezoneOffset);
                 }
                 if (newStart > 0) {
-                    if (isGMT && ((newStart+5) < text.length)) {
+                    if (isGMT && ((newStart + 5) < text.length)) {
                         char = text.charAt(newStart);
                         var delim:String = text.charAt(newStart + 3);
-                        if ( (char == "+" || char == "-") && delim == ":") {
-                            value = parseFloat(text.substr(newStart, 3) + text.substr(newStart+4, 2));
+                        if ((char == "+" || char == "-") && delim == ":") {
+                            value = parseFloat(text.substr(newStart, 3) + text.substr(newStart + 4, 2));
                             newStart += 5;
                         }
                     }
@@ -472,9 +620,11 @@ public class SimpleDateFormat {
                     isGMT = GMT_INDEX == index;
                     value = parseInt(TIMEZONE_OFFSETS[index] as String);
                 }
+
                 //Intentionally fall through to the next case PATTERN_ZONE_VALUE
             }
-            case PATTERN_ZONE_VALUE: {
+            case PATTERN_ZONE_VALUE:
+            {
                 var sign:int = 0;
                 if (value < 0) {
                     sign = -1;
@@ -484,10 +634,11 @@ public class SimpleDateFormat {
                 }
                 var hours:int = value / 100;
                 var minutes:int = value % 100;
-                dateBuilder.setTimezoneOffset(sign * (hours*60 + minutes));
+                dateBuilder.setTimezoneOffset(sign * (hours * 60 + minutes));
                 break;
             }
-            case PATTERN_ISO_ZONE: {
+            case PATTERN_ISO_ZONE:
+            {
                 break;
             }
             //UNSUPPORTED
@@ -495,7 +646,8 @@ public class SimpleDateFormat {
             case PATTERN_DAY_OF_WEEK_IN_MONTH:
             case PATTERN_WEEK_OF_YEAR:
             case PATTERN_WEEK_OF_MONTH:
-            case PATTERN_ISO_DAY_OF_WEEK: {
+            case PATTERN_ISO_DAY_OF_WEEK:
+            {
                 finish = -1;
             }
         }
@@ -546,23 +698,35 @@ public class SimpleDateFormat {
     public function subFormat(date:Date, formatChar:String, count:int):String {
         var result:String = "";
         switch (formatChar) {
-            case PATTERN_ERA: {
+            case PATTERN_ERA:
+            {
                 result = ERAS[date.fullYear > 0 ? 1 : 0];
                 break;
             }
-            case PATTERN_WEEK_YEAR:
-            case PATTERN_YEAR: {
+            case PATTERN_WEEK_YEAR_WITH_ERA:
+            case PATTERN_YEAR_WITH_ERA:{
                 var year:int = date.fullYear;
+                if (year < 0) {
+                    year = -year;
+                }
+                result = pol(year, count);
+                break;
+            }
+            case PATTERN_WEEK_YEAR:
+            case PATTERN_YEAR:
+            {
+                year = date.fullYear;
                 if (count == 2) {
                     year = year % 100;
                 }
                 result = pol(year, count);
                 break;
             }
-            case PATTERN_MONTH: {
+            case PATTERN_MONTH:
+            {
                 var month:int = date.month;
                 if (count <= 2) {
-                    result = pol(month+1, count);
+                    result = pol(month + 1, count);
                 } else if (count == 3) {
                     result = SHORT_MONTHS[month];
                 } else {
@@ -570,19 +734,23 @@ public class SimpleDateFormat {
                 }
                 break;
             }
-            case PATTERN_DAY_OF_MONTH: {
+            case PATTERN_DAY_OF_MONTH:
+            {
                 result = pol(date.date, count);
                 break;
             }
-            case PATTERN_HOUR_OF_DAY0: {       // 'H' 0-based.  eg, 23:59 + 1 hour =>> 00:59
+            case PATTERN_HOUR_OF_DAY0:
+            {       // 'H' 0-based.  eg, 23:59 + 1 hour =>> 00:59
                 result = pol(date.hours, count);
                 break;
             }
-            case PATTERN_HOUR0: {              // 'K' 0-based.  eg, 11PM + 1 hour =>> 0 AM
+            case PATTERN_HOUR0:
+            {              // 'K' 0-based.  eg, 11PM + 1 hour =>> 0 AM
                 result = pol(date.hours % 12, count);
                 break;
             }
-            case PATTERN_HOUR_OF_DAY1: {
+            case PATTERN_HOUR_OF_DAY1:
+            {
                 var hours:int = date.hours;
                 if (hours == 0) {
                     hours = 24;
@@ -590,7 +758,8 @@ public class SimpleDateFormat {
                 result = pol(hours, count);
                 break;
             }
-            case PATTERN_HOUR1: {
+            case PATTERN_HOUR1:
+            {
                 hours = date.hours % 12;
                 if (hours == 0) {
                     hours = 12;
@@ -598,23 +767,28 @@ public class SimpleDateFormat {
                 result = pol(hours, count);
                 break;
             }
-            case PATTERN_AM_PM: {
+            case PATTERN_AM_PM:
+            {
                 result = AM_PM[date.hours < 12 ? 0 : 1];
                 break;
             }
-            case PATTERN_MINUTE: {
+            case PATTERN_MINUTE:
+            {
                 result = pol(date.minutes, count);
                 break;
             }
-            case PATTERN_SECOND: {
+            case PATTERN_SECOND:
+            {
                 result = pol(date.seconds, count);
                 break;
             }
-            case PATTERN_MILLISECOND: {
+            case PATTERN_MILLISECOND:
+            {
                 result = pol(date.milliseconds, count);
                 break;
             }
-            case PATTERN_DAY_OF_WEEK: {
+            case PATTERN_DAY_OF_WEEK:
+            {
                 if (count >= 4) {
                     result = DAYS[date.day];
                 } else {
@@ -622,15 +796,18 @@ public class SimpleDateFormat {
                 }
                 break;
             }
-            case PATTERN_ZONE_NAME: {
+            case PATTERN_ZONE_NAME:
+            {
                 result = SHORT_TIMEZONES[GMT_INDEX] + formatTimezoneOffset(date.timezoneOffset, ":");
                 break;
             }
-            case PATTERN_ZONE_VALUE: {
+            case PATTERN_ZONE_VALUE:
+            {
                 result = formatTimezoneOffset(date.timezoneOffset);
                 break;
             }
-            case PATTERN_ISO_ZONE: {
+            case PATTERN_ISO_ZONE:
+            {
                 break;
             }
             //UNSUPPORTED
@@ -638,7 +815,8 @@ public class SimpleDateFormat {
             case PATTERN_DAY_OF_WEEK_IN_MONTH:
             case PATTERN_WEEK_OF_YEAR:
             case PATTERN_WEEK_OF_MONTH:
-            case PATTERN_ISO_DAY_OF_WEEK: {
+            case PATTERN_ISO_DAY_OF_WEEK:
+            {
             }
         }
         return result;
@@ -687,7 +865,7 @@ public class SimpleDateFormat {
             }
 
             //Not a letter
-            if ( !(char >= "a" && char <= "z" || char >= "A" && char <= "Z") ) {
+            if (!(char >= "a" && char <= "z" || char >= "A" && char <= "Z")) {
                 if (count != 0) {
                     result.push(new CompiledPart(lastChar, count));
                     lastChar = null;
@@ -720,15 +898,42 @@ public class SimpleDateFormat {
             result.push(new CompiledPart(lastChar, count));
         }
 
+        var formatContainsPatternEra:Boolean = false;
+        //Additional handling of ERA
+        for (var i:int = 0; i < result.length; i++) {
+            var part:CompiledPart = result[i] as CompiledPart;
+            if (part != null && part.char == PATTERN_ERA) {
+                formatContainsPatternEra = true;
+                break;
+            }
+        }
+        if (formatContainsPatternEra) {
+            for (var i:int = 0; i < result.length; i++) {
+                var part:CompiledPart = result[i] as CompiledPart;
+                if (part != null) {
+                    if (part.char == PATTERN_YEAR) {
+                        part.char = PATTERN_YEAR_WITH_ERA;
+                    } else if (part.char == PATTERN_WEEK_YEAR) {
+                        part.char = PATTERN_WEEK_YEAR_WITH_ERA;
+                    }
+                }
+            }
+        }
+
         return result;
     }
 
     private static function pol(value:int, count:int):String {
+        var prefix:String = "";
+        if (value < 0) {
+            prefix = "-";
+            value = -value;
+        }
         var result:String = String(value);
         while (result.length < count) {
             result = "0" + result;
         }
-        return result;
+        return prefix + result;
     }
 
     private static function formatTimezoneOffset(offset:int, delim:String = ""):String {
@@ -817,9 +1022,16 @@ class DateBuilder {
 
     public function build():Date {
         const result:Date = new Date();
+        var year:int = this.year;
+        if (era == "BC") {
+            year = -year;
+        }
+
+        var hour:int = this.hour;
         if (ampm == "PM" && hour < 12) {
             hour += 12;
         }
+
         //Timezone wasn't specified, will set local date and time
         if (isNaN(timezoneOffset)) {
             result.setFullYear(year, month, day);
@@ -828,6 +1040,7 @@ class DateBuilder {
             result.setUTCFullYear(year, month, day);
             result.setUTCHours(hour, minute - timezoneOffset, second, milliSecond);
         }
+
         return result;
     }
 }

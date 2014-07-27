@@ -15,16 +15,52 @@
  */
 
 package ru.kokorin.astream.ref {
+
+/**
+ * Reference handler
+ */
 public interface AStreamRef {
+    /**
+     * @param value object to test
+     * @return true if value has been added
+     */
     function hasRef(value:Object):Boolean;
+
+    /**
+     * @param value object to test
+     * @return reference in XML to the XML-description of supplied object
+     */
     function getRef(value:Object):Object;
 
+    /**
+     * Add object to internal storage
+     * @param value object to add
+     * @return value's reference in XML
+     */
     function addValue(value:Object):Object;
+
+    /**
+     * Get object from internal storage by its reference
+     * @param reference object's reference in XML
+     * @return object
+     */
     function getValue(reference:Object):Object;
 
+    /**
+     * Called from mapper when it starts a new node
+     * @param nodeName name of the node
+     */
     function beginNode(nodeName:String):void;
+
+    /**
+     * Called from mapper when it finishes a node
+     */
     function endNode():void;
 
+    /**
+     * Clear internal storage.
+     * Removes all referenced objects and their references.
+     */
     function clear():void;
 }
 }

@@ -21,6 +21,10 @@ import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
+/**
+ * Maps map to XML.
+ * @see ru.kokorin.astream.util.TypeUtil#isMap
+ */
 public class MapMapper extends BaseMapper {
     public function MapMapper(classInfo:ClassInfo) {
         super(classInfo);

@@ -25,11 +25,15 @@ import ru.kokorin.astream.mapper.handler.ImplicitMapHandler;
 import ru.kokorin.astream.mapper.handler.PropertyHandler;
 import ru.kokorin.astream.util.TypeUtil;
 
+/**
+ * Maps object's properties to nested XML attribute and element nodes
+ */
 public class ComplexMapper extends PropertyMapper {
     public function ComplexMapper(classInfo:ClassInfo) {
         super(classInfo);
     }
 
+    /** @inheritDoc */
     override protected function createPropertyHandler(property:Property):PropertyHandler {
         var result:PropertyHandler = null;
 

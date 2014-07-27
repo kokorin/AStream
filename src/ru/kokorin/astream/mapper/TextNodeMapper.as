@@ -23,9 +23,17 @@ import ru.kokorin.astream.mapper.handler.AttributeHandler;
 import ru.kokorin.astream.mapper.handler.PropertyHandler;
 import ru.kokorin.astream.mapper.handler.TextHandler;
 
+/**
+ * Maps one of object properties to text node.
+ * Others properties are mapped to attribute nodes.
+ */
 public class TextNodeMapper extends PropertyMapper {
     private var textPropertyName:String;
 
+    /**
+     * @param classInfo Description of Class which this mapper will handle
+     * @param textPropertyName name of property to be mapped to text node
+     */
     public function TextNodeMapper(classInfo:ClassInfo, textPropertyName:String) {
         super(classInfo);
         this.textPropertyName = textPropertyName;

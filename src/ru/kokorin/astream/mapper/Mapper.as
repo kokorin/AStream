@@ -18,15 +18,40 @@ package ru.kokorin.astream.mapper {
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
 
+/**
+ * An interface describing conversion of typed object
+ * to XML representation and back
+ */
 public interface Mapper {
+
+    /**
+     * Generate XML from object
+     * @param instance object to be processed
+     * @param ref reference handler
+     * @param nodeName optional XML element name. If not specified default name from
+     *                  registry should be used
+     * @return XML-description of instance
+     */
     function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML;
 
+    /**
+     * Restore object from XML
+     * @param xml XML-description of object
+     * @param ref reference handler
+     * @return restored object
+     */
     function fromXML(xml:XML, ref:AStreamRef):Object;
+
+    /**
+     * Registry for this mapper
+     */
+    function get registry():AStreamRegistry;
 
     function set registry(value:AStreamRegistry):void;
 
-    function get registry():AStreamRegistry;
-
+    /**
+     * Reset mapper cache. Is called automatically by <code>AStreamRegistry</code> upon configuration change.
+     */
     function reset():void;
 }
 }

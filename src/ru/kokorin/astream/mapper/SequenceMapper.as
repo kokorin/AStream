@@ -21,11 +21,16 @@ import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
+/**
+ * Base mapper that can handle sequence of objects.
+ * Objects are mapped one by one.
+ */
 public class SequenceMapper extends BaseMapper {
     public function SequenceMapper(classInfo:ClassInfo) {
         super(classInfo);
     }
 
+    /** @inheritDoc */
     override protected function fillObject(instance:Object, xml:XML, deref:AStreamRef):void {
         super.fillObject(instance, xml, deref);
         const sequence:Array = new Array();
@@ -37,6 +42,8 @@ public class SequenceMapper extends BaseMapper {
         setSequence(instance, sequence);
     }
 
+
+    /** @inheritDoc */
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillXML(instance, xml, ref);
         const sequence:Object = getSequence(instance);
@@ -54,9 +61,20 @@ public class SequenceMapper extends BaseMapper {
         );
     }
 
+    /**
+     * Update object properties by sequence
+     * @param instance instance to be updated by sequence
+     * @param sequence sequence of objects
+     */
     protected function setSequence(instance:Object, sequence:Array):void {
     }
 
+    /**
+     * Get sequence from object
+     * @param instance object
+     * @return sequence. Should be a collection.
+     * @see ru.kokorin.astream.util.TypeUtil#isCollection
+     */
     protected function getSequence(instance:Object):Object {
         return null;
     }

@@ -21,6 +21,11 @@ import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.converter.Converter;
 import ru.kokorin.astream.ref.AStreamRef;
 
+/**
+ * Maps object to a nested element node.
+ * Uses converter to get a string representation of object.
+ * @see ru.kokorin.astream.converter.Converter
+ */
 public class SimpleMapper implements Mapper {
     private var classInfo:ClassInfo;
     private var propertyName:String;
@@ -33,6 +38,7 @@ public class SimpleMapper implements Mapper {
         this.propertyName = propertyName;
     }
 
+    /** @inheritDoc */
     public function fromXML(xml:XML, ref:AStreamRef):Object {
         var result:Object = null;
         if (xml != null && converter != null) {
@@ -41,6 +47,7 @@ public class SimpleMapper implements Mapper {
         return result;
     }
 
+    /** @inheritDoc */
     public function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML {
         if (nodeName == null) {
             nodeName = this.nodeName;
@@ -52,6 +59,7 @@ public class SimpleMapper implements Mapper {
         return result;
     }
 
+    /** @inheritDoc */
     public function get registry():AStreamRegistry {
         return _registry;
     }
@@ -61,6 +69,7 @@ public class SimpleMapper implements Mapper {
         reset();
     }
 
+    /** @inheritDoc */
     public function reset():void {
         nodeName = registry.getAlias(classInfo);
         converter = registry.getConverterForProperty(classInfo, propertyName);

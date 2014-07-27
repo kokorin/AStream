@@ -20,15 +20,27 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.ref.AStreamRef;
 
+/**
+ * Base implementation of <code>Mapper</code> interface.
+ * The main purpose of this class is to handle references in object and XML.
+ */
 public class BaseMapper implements Mapper {
     private var _classInfo:ClassInfo;
     private var _registry:AStreamRegistry;
     private var nodeName:String;
 
+    /**
+     * @param classInfo Description of Class which this mapper will handle
+     */
     public function BaseMapper(classInfo:ClassInfo) {
         this._classInfo = classInfo;
     }
 
+    /**
+     * If you need to override this method, possibly you should implement <code>Mapper</code>
+     * interface by yourself
+     * @inheritDoc
+     */
     public final function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML {
         if (nodeName == null) {
             nodeName = this.nodeName;
@@ -48,6 +60,11 @@ public class BaseMapper implements Mapper {
         return result;
     }
 
+    /**
+     * If you need to override this method, possibly you should implement <code>Mapper</code>
+     * interface by yourself
+     * @inheritDoc
+     */
     public final function fromXML(xml:XML, ref:AStreamRef):Object {
         var result:Object = null;
 
@@ -66,6 +83,15 @@ public class BaseMapper implements Mapper {
         return result;
     }
 
+    /**
+     * Set values of child nodes of XML with values of instance's properties
+     * @param instance object to be described
+     * @param xml XML to be filled
+     * @param ref reference handler
+     *
+     * Called only when instance haven't been already processed.
+     * Should be overridden by subclasses
+     */
     protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         const reference:Object = ref.addValue(instance);
         if (reference is Number) {
@@ -73,6 +99,15 @@ public class BaseMapper implements Mapper {
         }
     }
 
+    /**
+     * Set instance's properties with values from XML child nodes
+     * @param instance whose properties are to be set
+     * @param xml to read values from
+     * @param ref reference handler
+     *
+     * Called only when xml node is not a reference to other node.
+     * Should be overridden by subclasses
+     */
     protected function fillObject(instance:Object, xml:XML, ref:AStreamRef):void {
         ref.addValue(instance);
     }
@@ -81,6 +116,7 @@ public class BaseMapper implements Mapper {
         return _classInfo;
     }
 
+    /** @inheritDoc */
     public function get registry():AStreamRegistry {
         return _registry;
     }

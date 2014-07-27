@@ -23,6 +23,9 @@ import ru.kokorin.astream.mapper.handler.BaseHandler;
 import ru.kokorin.astream.mapper.handler.PropertyHandler;
 import ru.kokorin.astream.ref.AStreamRef;
 
+/**
+ * Base mapper that can handle object properties
+ */
 public class PropertyMapper extends BaseMapper {
     private var processed:Boolean = false;
     private var propertyHandlers:Array = new Array();
@@ -65,10 +68,21 @@ public class PropertyMapper extends BaseMapper {
         propertyHandlers = result;
     }
 
+    /**
+     * Create handler for property.
+     * @param property description of Class' property
+     * @return handler that will map specified property
+     *
+     * Method is called for every public property of Class that can be mapped, i.e.
+     * not omitted, readable and writable.
+     *
+     * Should be overridden by subclasses.
+     */
     protected function createPropertyHandler(property:Property):PropertyHandler {
         return null;
     }
 
+    /** @inheritDoc */
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillXML(instance, xml, ref);
         process();
@@ -77,6 +91,7 @@ public class PropertyMapper extends BaseMapper {
         }
     }
 
+    /** @inheritDoc */
     override protected function fillObject(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillObject(instance, xml, ref);
         process();
@@ -85,6 +100,7 @@ public class PropertyMapper extends BaseMapper {
         }
     }
 
+    /** @inheritDoc */
     override public function reset():void {
         super.reset();
         propertyHandlers = null;

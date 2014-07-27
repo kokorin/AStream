@@ -15,6 +15,7 @@
  */
 
 package ru.kokorin.astream.ref {
+
 public class IdRef implements AStreamRef {
     private var nextId:int;
     private const values:Array = new Array();

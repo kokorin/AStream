@@ -20,16 +20,22 @@ import org.spicefactory.lib.reflect.ClassInfo;
 import ru.kokorin.astream.AStreamRegistry;
 import ru.kokorin.astream.util.TypeUtil;
 
+/**
+ * Maps a collection to a sequence of nested XML element nodes.
+ * @see ru.kokorin.astream.util.TypeUtil#isCollection
+ */
 public class CollectionMapper extends SequenceMapper {
 
     public function CollectionMapper(classInfo:ClassInfo) {
         super(classInfo);
     }
 
+    /** @inheritDoc */
     override protected function setSequence(instance:Object, sequence:Array):void {
         TypeUtil.addToCollection(instance, sequence);
     }
 
+    /** @inheritDoc */
     override protected function getSequence(instance:Object):Object {
         return instance;
     }

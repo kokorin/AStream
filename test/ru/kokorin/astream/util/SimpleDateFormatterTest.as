@@ -3,8 +3,10 @@ import org.flexunit.asserts.assertEquals;
 
 [RunWith("org.flexunit.runners.Parameterized")]
 public class SimpleDateFormatterTest {
-    private static const DATE:Date = new Date(1986, 8, 24);
-    private static const DATETIME:Date = new Date(2014, 5, 21, 9, 10, 59, 34);
+    private static const DATE:Date = createDate(1986, 9, 24);
+    private static const DATE_BC:Date = createDate(-7, 1, 1);
+    private static const DATE_AD:Date = createDate(7, 1, 1);
+    private static const DATETIME:Date = createDate(2014, 6, 21, 9, 10, 59, 34);
 
     public static var DATE_DATA:Array = [
         ["YYYY-MM-dd",  DATE, "1986-09-24"],
@@ -15,20 +17,24 @@ public class SimpleDateFormatterTest {
         ["dd MMM YYYY", DATE, "24 Sep 1986"],
 
         ["yyyy.MM.dd G 'at' HH:mm:ss", DATETIME, "2014.06.21 AD at 09:10:59"],
-        ["yyyy.MM.dd KK 'o''clock' a",  new Date(2014, 5, 21, 21),  "2014.06.21 09 o'clock PM"],
-        ["yyyy.MM.dd KK 'o''clock' a",  new Date(2014, 5, 21, 9),   "2014.06.21 09 o'clock AM"],
-        ["yyyy.MM.dd hh 'o''clock' a",  new Date(2014, 5, 21,  21), "2014.06.21 09 o'clock PM"],
-        ["yyyy.MM.dd hh 'o''clock' a",  new Date(2014, 5, 21,  9),  "2014.06.21 09 o'clock AM"],
-        ["yyyy.MM.dd hh 'o''clock' a",  new Date(2014, 5, 21,  0),  "2014.06.21 12 o'clock AM"],
-        ["yyyy.MM.dd HH 'o''clock'",    new Date(2014, 5, 21, 21),  "2014.06.21 21 o'clock"],
-        ["yyyy.MM.dd kk 'o''clock'",    new Date(2014, 5, 21, 0),   "2014.06.21 24 o'clock"]
+        ["yyyy.MM.dd KK 'o''clock' a",  createDate(2014, 6, 21, 21), "2014.06.21 09 o'clock PM"],
+        ["yyyy.MM.dd KK 'o''clock' a",  createDate(2014, 6, 21, 9),  "2014.06.21 09 o'clock AM"],
+        ["yyyy.MM.dd hh 'o''clock' a",  createDate(2014, 6, 21, 21), "2014.06.21 09 o'clock PM"],
+        ["yyyy.MM.dd hh 'o''clock' a",  createDate(2014, 6, 21, 9),  "2014.06.21 09 o'clock AM"],
+        ["yyyy.MM.dd hh 'o''clock' a",  createDate(2014, 6, 21, 0),  "2014.06.21 12 o'clock AM"],
+        ["yyyy.MM.dd HH 'o''clock'",    createDate(2014, 6, 21, 21), "2014.06.21 21 o'clock"],
+        ["yyyy.MM.dd kk 'o''clock'",    createDate(2014, 6, 21, 0),  "2014.06.21 24 o'clock"],
+
+        ["d MMM Y G", DATE, "24 Sep 1986 AD"],
+        ["d MMM Y G", DATE_BC, "1 Jan 7 BC"],
+        ["d MMM Y G", DATE_AD, "1 Jan 7 AD"]
     ];
 
     [Test(dataProvider="DATE_DATA")]
     public function testParseAndFormat(pattern:String, date:Date, text:String):void {
         const format:SimpleDateFormat = new SimpleDateFormat(pattern);
 
-        assertEquals("Parsed date: ", String(date), String(format.parse(text)));
+        assertEquals("Parsed date " + text + ": ", String(date), String(format.parse(text)));
         assertEquals("Formatted date: ", text, format.format(date));
     }
 
@@ -56,6 +62,14 @@ public class SimpleDateFormatterTest {
         assertEquals("Minutes ", minutesUTC, date.minutesUTC);
         assertEquals("Seconds ", secondsUTC, date.secondsUTC);
         assertEquals("MilliSeconds ", millisecondsUTC, date.millisecondsUTC);
+    }
+
+    private static function createDate(year:int, month:int, date:int,
+                                       hours:int = 0, minutes:int = 0, seconds:int = 0, mils:int = 0):Date {
+        const result:Date = new Date();
+        result.setFullYear(year, month-1, date);
+        result.setHours(hours, minutes, seconds, mils);
+        return result;
     }
 }
 }

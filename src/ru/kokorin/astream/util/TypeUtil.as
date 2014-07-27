@@ -15,12 +15,9 @@
  */
 
 package ru.kokorin.astream.util {
-import as3.lang.Enum;
-
 import flash.utils.Dictionary;
 
 import org.spicefactory.lib.collection.List;
-
 import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 
@@ -35,23 +32,29 @@ public class TypeUtil {
     private static const ITEM_TYPE_MAP:Map = new Map();
     private static const VECTOR_NAME_REGEXP:RegExp = /__AS3__\.vec::Vector\.<(.*)>/;
 
-    /** Checks if supplied type is a Map:
-     *  Object, flash.utils.Dictionary, org.spicefactory.lib.collection.Map
-     * @param classInfo - type to check*/
+    /**
+     * Checks if supplied type is a Map:
+     * Object, flash.utils.Dictionary, org.spicefactory.lib.collection.Map
+     * @param classInfo - type to check
+     */
     public static function isMap(classInfo:ClassInfo):Boolean {
         return MAP_CLASSES.indexOf(classInfo) != -1;
     }
 
-    /** Checks if supplied type implements mx.collections.IList interface.
-     *  Does not depend on IList.
-     *  @param classInfo - type to check*/
+    /**
+     * Checks if supplied type implements mx.collections.IList interface.
+     * Does not depend on IList.
+     * @param classInfo - type to check
+     */
     private static function isList(classInfo:ClassInfo):Boolean {
         return ILIST_TYPE != null && classInfo.isType(ILIST_TYPE.getClass());
     }
 
-    /** Checks if supplied type is Vector.
-     *  Does not depend on Vector.
-     *  @param classInfo - type to check*/
+    /**
+     * Checks if supplied type is Vector.
+     * Does not depend on Vector.
+     * @param classInfo - type to check
+     */
     public static function isVector(classInfo:ClassInfo):Boolean {
         if (IS_VECTOR_MAP.containsKey(classInfo)) {
             return IS_VECTOR_MAP.get(classInfo) as Boolean;
@@ -67,9 +70,11 @@ public class TypeUtil {
         return result;
     }
 
-    /** Checks if supplied type is either Array, Vector, mx.collections.IList or org.spicefactory.lib.collection.List
-     *  Does not depend on IList or Vector.
-     *  @param classInfo - type to check*/
+    /**
+     * Checks if supplied type is either Array, Vector, mx.collections.IList or org.spicefactory.lib.collection.List
+     * Does not depend on IList or Vector.
+     * @param classInfo - type to check
+     */
     public static function isCollection(classInfo:ClassInfo):Boolean {
         return classInfo.isType(Array) || classInfo.isType(List) || isList(classInfo) || isVector(classInfo);
     }
@@ -156,7 +161,7 @@ public class TypeUtil {
      * @param collection — collection to iterate through
      * @param callback — The function to run on each item in the array.
      * This function is invoked with three arguments:
-        function callback(item:*, index:int, collection:Object):void;
+     *  function callback(item:*, index:int, collection:Object):void;
      */
     public static function forEachInCollection(collection:Object, callback:Function):void {
         if (collection == null || callback == null) {
@@ -194,11 +199,12 @@ public class TypeUtil {
             }
         }
     }
+
     /**
      * @param map — map to iterate through
      * @param callback — The function to run on each item in the array.
      * This function is invoked with three arguments:
-        function callback(item:*, key:*, map:Object):void;
+     function callback(item:*, key:*, map:Object):void;
      */
     public static function forEachInMap(map:Object, callback:Function):void {
         if (map == null || callback == null) {

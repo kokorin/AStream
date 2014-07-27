@@ -34,6 +34,10 @@ public class AStream {
         mode = AStreamMode.XPATH_RELATIVE_REFERENCES;
     }
 
+    /**
+     * @default AStreamMode.XPATH_RELATIVE_REFERENCES
+     * @param value reference handling mode
+     */
     public function set mode(value:AStreamMode):void {
         switch (value) {
             case AStreamMode.NO_REFERENCES: {
@@ -64,6 +68,53 @@ public class AStream {
         }
     }
 
+    /**
+     * Process metadata on supplied classes
+     * @param classOrArray Class or Array of classes
+     *
+     * <p>
+     * [AStreamAlias("alias")] - both class and property level
+     * Sets alias for class or property
+     * </p>
+     *
+     * <p>
+     * [AStreamAsAttribute] - property level
+     * Map property to attribute node. Converter must be registered for the type of the property
+     * or for the property itself.
+     * </p>
+     *
+     * <p>
+     * [AStreamOmitField] - property level
+     * Omit the property from processing
+     * </p>
+     *
+     * <p>
+     * [AStreamOrder(10)] - property level
+     * Order in which the property will be processed.
+     * There is no guarantee in Flash that you will get class' properties in order they were declared!
+     * Use this metadata if order is significant. Otherwise they will be ordered alphabetically.
+     * </p>
+     *
+     * <p>
+     * [AStreamImplicit("itemName", itemType="full.qualified.ClassName", keyProperty="key")] - property level
+     * Add elements directly as child element nodes.
+     * It is possible to omit itemType from metadata if the property is a Vector (<code>Vector.<ClassName></code>) or
+     * if [ArrayElementType("full.qualified.ClassName")] metadata is specified on the property.
+     * keyProperty is taken into account only for maps.
+     * </p>
+     *
+     * <p>
+     * [AStreamConverter("full.qualified.ConverterName", params="", paramDelimiter="")] - both class and property level
+     * </p>
+     *
+     * <p>
+     * [AStreamConverter("full.qualified.MapperName", params="", paramDelimiter="")] - both class and property level
+     * </p>
+     *
+     * @see http://xstream.codehaus.org/alias-tutorial.html XStream alias tutorial
+     * @see http://xstream.codehaus.org/graphs.html XStream Object references
+     * @see http://xstream.codehaus.org/manual-tweaking-output.html#Configuration_ImplicitCollection XStream Implicit collections and maps
+     */
     public function processMetadata(classOrArray:Object):void {
         if (classOrArray is Class) {
             classOrArray = [classOrArray];
@@ -75,37 +126,72 @@ public class AStream {
         needReset = true;
     }
 
+    /**
+     * Register global converter for class.
+     * @param converter global converter
+     * @param clazz class which can be handled by converter
+     *
+     * Automatically global SimpleTypeMapper will be set up for specified clazz.
+     * @see ru.kokorin.astream.mapper.SimpleMapper
+     */
     public function registerConverter(converter:Converter, clazz:Class):void {
         registry.registerConverter(converter, ClassInfo.forClass(clazz));
     }
 
+    /**
+     * Register converter for class' property
+     *
+     * Automatically global SimpleTypeMapper will be set up for specified clazz.
+     * @see ru.kokorin.astream.mapper.SimpleMapper
+     */
     public function registerConverterForProperty(converter:Converter, clazz:Class, propertyName:String):void {
         registry.registerConverterForProperty(converter, ClassInfo.forClass(clazz), propertyName);
     }
 
+    /**
+     * Register global mapper for class.
+     * @param mapper
+     * @param clazz
+     */
     public function registerMapper(mapper:Mapper, clazz:Class):void {
         registry.registerMapper(mapper, ClassInfo.forClass(clazz));
     }
 
+    /**
+     * Register mapper for class' property
+     */
     public function registerMapperForProperty(mapper:Mapper, clazz:Class, propertyName:String):void {
         registry.registerMapperForProperty(mapper, ClassInfo.forClass(clazz), propertyName);
     }
 
+    /**
+     * Set up class' alias
+     */
     public function alias(name:String, clazz:Class):void {
         registry.alias(name, ClassInfo.forClass(clazz));
         needReset = true;
     }
 
+    /**
+     * Set up property's alias
+     */
     public function aliasProperty(name:String, clazz:Class, propertyName:String):void {
         registry.aliasProperty(name, ClassInfo.forClass(clazz), propertyName);
         needReset = true;
     }
 
+    /**
+     * Map property to attribute node
+     */
     public function useAttributeFor(clazz:Class, propertyName:String):void {
         registry.attribute(ClassInfo.forClass(clazz), propertyName);
         needReset = true;
     }
 
+    /**
+     * Set up alias for package
+     * @see http://xstream.codehaus.org/alias-tutorial.html#packages XStream Package aliasing
+     */
     public function aliasPackage(name:String, pckg:String):void {
         registry.aliasPackage(name, pckg);
         needReset = true;
