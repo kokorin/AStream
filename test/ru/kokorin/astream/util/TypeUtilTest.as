@@ -66,7 +66,7 @@ public class TypeUtilTest {
 
         TypeUtil.addToCollection(collection, items);
         TypeUtil.forEachInCollection(collection,
-                function(item:Object, index:int, collection:Object) {
+                function(item:Object, index:int, collection:Object):void {
                     copy[index] = item;
                 }
         );
@@ -83,7 +83,7 @@ public class TypeUtilTest {
 
         var hasItems:Boolean = false;
         TypeUtil.forEachInCollection(collection,
-                function(item:Object, index:int, collection:Object) {
+                function(item:Object, index:int, collection:Object):void {
                     hasItems = true;
                 }
         );
@@ -118,7 +118,7 @@ public class TypeUtilTest {
 
         TypeUtil.putToMap(map, keys, values);
         TypeUtil.forEachInMap(map,
-                function(value:Object, key:Object, map:Object) {
+                function(value:Object, key:Object, map:Object):void {
                     copyKeys.push(key);
                     copyValues.push(value);
                 }

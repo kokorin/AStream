@@ -828,8 +828,9 @@ public class SimpleDateFormat {
         var inQuote:Boolean = false;
         var count:int = 0;
         var lastChar:String = null;
+        var i:int;
 
-        for (var i:int = 0; i < pattern.length; i++) {
+        for (i = 0; i < pattern.length; i++) {
             var char:String = pattern.charAt(i);
             if (char == QUOTE_CHAR) {
                 // '' is treated as a single quote regardless of being
@@ -898,18 +899,19 @@ public class SimpleDateFormat {
             result.push(new CompiledPart(lastChar, count));
         }
 
+        var part:CompiledPart;
         var formatContainsPatternEra:Boolean = false;
         //Additional handling of ERA
-        for (var i:int = 0; i < result.length; i++) {
-            var part:CompiledPart = result[i] as CompiledPart;
+        for (i = 0; i < result.length; i++) {
+            part = result[i] as CompiledPart;
             if (part != null && part.char == PATTERN_ERA) {
                 formatContainsPatternEra = true;
                 break;
             }
         }
         if (formatContainsPatternEra) {
-            for (var i:int = 0; i < result.length; i++) {
-                var part:CompiledPart = result[i] as CompiledPart;
+            for (i = 0; i < result.length; i++) {
+                part = result[i] as CompiledPart;
                 if (part != null) {
                     if (part.char == PATTERN_YEAR) {
                         part.char = PATTERN_YEAR_WITH_ERA;
