@@ -459,7 +459,7 @@ public class SimpleDateFormat {
         return dateBuilder.build();
     }
 
-    private function subParse(text:String, start:int, formatChar:String, count:int, obeyCount:Boolean, dateBuilder:DateBuilder):int {
+    private static function subParse(text:String, start:int, formatChar:String, count:int, obeyCount:Boolean, dateBuilder:DateBuilder):int {
         var value:Number = NaN;
         var finish:int = -1;
         var digits:int = 0;
@@ -655,7 +655,7 @@ public class SimpleDateFormat {
         return finish;
     }
 
-    private function matchString(text:String, start:int, values:Array, callback:Function):int {
+    private static function matchString(text:String, start:int, values:Array, callback:Function):int {
         var match:String;
         var matchIndex:int;
         //Look for longest matching string
@@ -695,7 +695,7 @@ public class SimpleDateFormat {
         return result;
     }
 
-    public function subFormat(date:Date, formatChar:String, count:int):String {
+    private static function subFormat(date:Date, formatChar:String, count:int):String {
         var result:String = "";
         switch (formatChar) {
             case PATTERN_ERA:

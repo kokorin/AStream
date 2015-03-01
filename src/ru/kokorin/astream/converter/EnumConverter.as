@@ -28,9 +28,12 @@ public class EnumConverter implements Converter {
     }
 
     public function fromString(string:String):Object {
-        const staticProperty:Property = classInfo.getStaticProperty(string);
-        if (staticProperty != null) {
-            return staticProperty.getValue(null);
+        for each (var staticProperty:Property in classInfo.getStaticProperties()) {
+            var enum:Enum = staticProperty.getValue(null) as Enum;
+            //It seems that there is an additional static property "prototype"
+            if (enum != null && enum.name == string) {
+                return enum;
+            }
         }
         return null;
     }
