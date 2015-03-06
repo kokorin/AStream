@@ -21,6 +21,7 @@ public class BaseHandler implements PropertyHandler {
     private var _nodeName:String;
     private var _nodeType:NodeType;
 
+
     public function BaseHandler(nodeName:String, nodeType:NodeType) {
         _nodeName = nodeName;
         _nodeType = nodeType;

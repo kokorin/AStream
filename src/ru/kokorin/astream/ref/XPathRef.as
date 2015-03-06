@@ -17,17 +17,17 @@
 package ru.kokorin.astream.ref {
 public class XPathRef extends BaseRef implements AStreamRef {
     private var relative:Boolean;
+    //TODO replace with MAP
     private const instanceXPathPairs:Array = new Array();
 
     public function XPathRef(forceSingleNode:Boolean, relative:Boolean) {
         super(forceSingleNode);
         this.relative = relative;
-        clear();
     }
 
     public function addValue(value:Object):Object {
         const pair:InstancePathPair = new InstancePathPair();
-        const xPath:Array = getCurrentXPath();
+        const xPath:Array = getCurrentXPath().concat();
         pair.instance = value;
         pair.xPath = xPath;
         instanceXPathPairs.push(pair);
@@ -86,10 +86,12 @@ public class XPathRef extends BaseRef implements AStreamRef {
         if (!relative) {
             return relativeXPath;
         }
-        relativeXPath = relativeXPath.concat();
-        const result:Array = getCurrentXPath();
-        while (relativeXPath.length > 0) {
-            var part:String = relativeXPath.shift() as String;
+
+        const result:Array = getCurrentXPath().concat();
+        const relativeLength:int = relativeXPath.length;
+
+        for (var i:int = 0; i < relativeLength; ++i) {
+            var part:String = relativeXPath[i] as String;
             if (part == "..") {
                 result.pop();
             } else if (part != ".") {
@@ -103,20 +105,22 @@ public class XPathRef extends BaseRef implements AStreamRef {
         if (!relative) {
             return toXPath;
         }
-        toXPath = toXPath.concat();
+
         const fromXPath:Array = getCurrentXPath();
-        while (toXPath.length > 0 && fromXPath.length > 0) {
-            if (toXPath[0] != fromXPath[0]) {
+        const length:uint = toXPath.length < fromXPath.length ? toXPath.length : fromXPath.length;
+        for (var i:int = 0; i < length; ++i) {
+            if (toXPath[i] != fromXPath[i]) {
                 break;
             }
-            toXPath.shift();
-            fromXPath.shift();
         }
+        const diffIndex:uint = i;
 
-        for (var i:int = 0; i < fromXPath.length; i++) {
-            toXPath.unshift("..");
+        var result:Array = new Array();
+        for (i = fromXPath.length - diffIndex; i > 0; --i) {
+            result.push("..");
         }
-        return toXPath;
+        result = result.concat(toXPath.slice(diffIndex));
+        return result;
     }
 
     private static function xPathToString(xPath:Array):String {

@@ -28,6 +28,7 @@ public class BaseMapper implements Mapper {
     private var _classInfo:ClassInfo;
     private var _registry:AStreamRegistry;
     private var nodeName:String;
+    private var clazz:Class;
 
     /**
      * @param classInfo Description of Class which this mapper will handle
@@ -74,7 +75,7 @@ public class BaseMapper implements Mapper {
             if (attRef != null) {
                 result = ref.getValue(String(attRef));
             } else if (classInfo != null) {
-                result = classInfo.newInstance([]);
+                result = new clazz();
                 fillObject(result, xml, ref);
             }
             ref.endNode();
@@ -128,6 +129,7 @@ public class BaseMapper implements Mapper {
 
     public function reset():void {
         nodeName = registry.getAlias(classInfo);
+        clazz = classInfo.getClass();
     }
 }
 }

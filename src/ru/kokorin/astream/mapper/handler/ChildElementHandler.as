@@ -24,25 +24,27 @@ import ru.kokorin.astream.mapper.Mapper;
 import ru.kokorin.astream.ref.AStreamRef;
 
 public class ChildElementHandler extends BaseHandler {
-    private var property:Property;
+    private var propertyName:String;
+    private var propertyType:ClassInfo;
     private var registry:AStreamRegistry;
     private var defaultMapper:Mapper;
 
     public function ChildElementHandler(property:Property, nodeName:String, registry:AStreamRegistry) {
         super(nodeName, NodeType.ELEMENT);
-        this.property = property;
+        this.propertyName = property.name;
+        this.propertyType = property.type;
         this.registry = registry;
         this.defaultMapper = registry.getMapperForProperty(property.owner, property.name);
     }
 
     override public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
-        const value:Object = property.getValue(parentInstance);
+        const value:Object = parentInstance[propertyName];
         if (value != null) {
             const valueType:ClassInfo = ClassInfo.forInstance(value);
             var valueMapper:Mapper;
             var className:String = null;
             /* int is subtype of Number! We do not need "class" attribute in XML in case of any numbers*/
-            if (!valueType.isType(Number) && valueType != property.type) {
+            if (!valueType.isType(Number) && valueType != propertyType) {
                 valueMapper = registry.getMapper(valueType);
                 className = registry.getAlias(valueType);
             } else {
@@ -70,7 +72,7 @@ public class ChildElementHandler extends BaseHandler {
             }
             value = valueMapper.fromXML(elementValue, deref);
         }
-        property.setValue(parentInstance, value);
+        parentInstance[propertyName] = value;
     }
 }
 }

@@ -19,7 +19,6 @@ import org.spicefactory.lib.collection.Map;
 import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Property;
 
-import ru.kokorin.astream.mapper.handler.BaseHandler;
 import ru.kokorin.astream.mapper.handler.PropertyHandler;
 import ru.kokorin.astream.ref.AStreamRef;
 
@@ -86,7 +85,7 @@ public class PropertyMapper extends BaseMapper {
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillXML(instance, xml, ref);
         process();
-        for each (var handler:BaseHandler in propertyHandlers) {
+        for each (var handler:PropertyHandler in propertyHandlers) {
             handler.toXML(instance, xml, ref);
         }
     }
@@ -95,7 +94,7 @@ public class PropertyMapper extends BaseMapper {
     override protected function fillObject(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillObject(instance, xml, ref);
         process();
-        for each (var handler:BaseHandler in propertyHandlers) {
+        for each (var handler:PropertyHandler in propertyHandlers) {
             handler.fromXML(xml, instance, ref);
         }
     }

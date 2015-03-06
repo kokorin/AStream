@@ -29,7 +29,7 @@ public class NoRef extends BaseRef implements AStreamRef {
     }
 
     public function addValue(value:Object):Object {
-        const curPath:Array = getCurrentXPath();
+        const curPath:Array = getCurrentXPath().concat();
         if (pathMap.containsKey(value)) {
             const prevPath:Array = pathMap.get(value) as Array;
             if (isParentPath(curPath, prevPath)) {
@@ -53,7 +53,8 @@ public class NoRef extends BaseRef implements AStreamRef {
         if (path.length > parentPath.length) {
             return false;
         }
-        for (var i:int = 0; i < path.length; i++) {
+        const path_length:uint = path.length;
+        for (var i:int = 0; i < path_length; i++) {
             if (path[i] != parentPath[i]) {
                 return false;
             }

@@ -17,25 +17,27 @@
 package ru.kokorin.astream.converter {
 import as3.lang.Enum;
 
+import org.spicefactory.lib.collection.Map;
+
 import org.spicefactory.lib.reflect.ClassInfo;
 import org.spicefactory.lib.reflect.Property;
 
 public class EnumConverter implements Converter {
-    private var classInfo:ClassInfo;
+    private var staticPropertyMap:Map;
 
     public function EnumConverter(classInfo:ClassInfo) {
-        this.classInfo = classInfo;
-    }
-
-    public function fromString(string:String):Object {
+        this.staticPropertyMap = new Map();
         for each (var staticProperty:Property in classInfo.getStaticProperties()) {
             var enum:Enum = staticProperty.getValue(null) as Enum;
             //It seems that there is an additional static property "prototype"
-            if (enum != null && enum.name == string) {
-                return enum;
+            if (enum != null) {
+                staticPropertyMap.put(enum.name, enum);
             }
         }
-        return null;
+    }
+
+    public function fromString(string:String):Object {
+        return staticPropertyMap.get(string);
     }
 
     public function toString(value:Object):String {
@@ -45,5 +47,6 @@ public class EnumConverter implements Converter {
         }
         return null;
     }
+
 }
 }

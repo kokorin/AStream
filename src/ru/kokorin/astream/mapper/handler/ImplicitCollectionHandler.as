@@ -24,20 +24,24 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class ImplicitCollectionHandler extends BaseHandler {
-    private var property:Property;
+    private var propertyName:String;
     private var itemType:ClassInfo;
     private var registry:AStreamRegistry;
+    private var itemMapper:Mapper;
+    private var clazz:Class;
+
 
     public function ImplicitCollectionHandler(property:Property, nodeName:String, itemType:ClassInfo, registry:AStreamRegistry) {
         super(nodeName, NodeType.ELEMENT);
-        this.property = property;
+        this.propertyName = property.name;
         this.itemType = itemType;
         this.registry = registry;
+        this.itemMapper = registry.getMapper(itemType);
+        this.clazz = property.type.getClass();
     }
 
     override public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
-        const value:Object = property.getValue(parentInstance);
-        const itemMapper:Mapper = registry.getMapper(itemType);
+        const value:Object = parentInstance[propertyName];
         TypeUtil.forEachInCollection(value,
                 function (item:Object, i:int, collection:Object):void {
                     if (item == null) {
@@ -51,7 +55,6 @@ public class ImplicitCollectionHandler extends BaseHandler {
 
     override public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         var result:Object;
-        const itemMapper:Mapper = registry.getMapper(itemType);
         const items:Array = new Array();
         for each (var itemXML:XML in parentXML.elements(nodeName)) {
             var item:Object = itemMapper.fromXML(itemXML, deref);
@@ -59,11 +62,11 @@ public class ImplicitCollectionHandler extends BaseHandler {
         }
 
         if (items.length > 0) {
-            result = property.type.newInstance([]);
+            result = new clazz();
             TypeUtil.addToCollection(result, items);
         }
 
-        property.setValue(parentInstance, result);
+        parentInstance[propertyName] = result;
     }
 }
 }

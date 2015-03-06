@@ -22,17 +22,17 @@ import ru.kokorin.astream.converter.Converter;
 import ru.kokorin.astream.ref.AStreamRef;
 
 public class TextHandler extends BaseHandler {
-    private var property:Property;
+    private var propertyName:String;
     private var converter:Converter;
 
     public function TextHandler(property:Property, registry:AStreamRegistry) {
         super("", NodeType.TEXT);
-        this.property = property;
+        this.propertyName = property.name;
         this.converter = registry.getConverterForProperty(property.owner, property.name);
     }
 
     override public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
-        const value:Object = property.getValue(parentInstance);
+        const value:Object = parentInstance[propertyName];
         if (value != null && converter != null) {
             parentXML.text()[0] = converter.toString(value);
         }
@@ -44,7 +44,7 @@ public class TextHandler extends BaseHandler {
         if (textValue != null && converter != null) {
             value = converter.fromString(String(textValue));
         }
-        property.setValue(parentInstance, value);
+        parentInstance[propertyName] = value;
     }
 }
 }

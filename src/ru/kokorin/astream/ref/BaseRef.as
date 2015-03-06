@@ -18,6 +18,7 @@ package ru.kokorin.astream.ref {
 public class BaseRef {
     private var forceSingleNode:Boolean;
     private const currentNodePath:Array = new Array();
+    private const currentXPath:Array = [""];
 
     public function BaseRef(forceSingleNode:Boolean = false) {
         this.forceSingleNode = forceSingleNode;
@@ -33,31 +34,27 @@ public class BaseRef {
             currentNodeData.childNodeCount.put(nodeName, nodeIndex);
         }
         currentNodePath.push(new NodeData(nodeName, nodeIndex));
+
+        const temp:Array = [nodeName];
+        if (forceSingleNode || nodeIndex > 0) {
+            temp.push("[", nodeIndex + 1, "]");
+        }
+        currentXPath.push(temp.join(""));
     }
 
     public function endNode():void {
         const nodeData:NodeData = currentNodePath.pop() as NodeData;
         nodeData.childNodeCount.removeAll();
+        currentXPath.pop();
     }
 
     public function clear():void {
         currentNodePath.splice(0);
-        //first NodeData's path is always an empty string ("")
-        currentNodePath.push(new NodeData("", 0));
+        currentXPath.splice(1);
     }
 
     protected function getCurrentXPath():Array {
-        const result:Array = new Array();
-        for (var i:int = 0; i < currentNodePath.length; i++) {
-            var nodeData:NodeData = currentNodePath[i] as NodeData;
-            var indexStr:String = "";
-            //first NodeData's path is always an empty string ("")
-            if (i > 0 && (nodeData.index > 0 || forceSingleNode)) {
-                indexStr = "[" + (nodeData.index + 1) + "]";
-            }
-            result.push(nodeData.name + indexStr);
-        }
-        return result;
+        return currentXPath;
     }
 }
 }

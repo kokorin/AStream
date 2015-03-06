@@ -24,24 +24,27 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class ImplicitMapHandler extends BaseHandler {
-    private var property:Property;
+    private var propertyName:String;
     private var itemType:ClassInfo;
-    private var keyProperty:Property;
+    private var keyPropertyName:String;
     private var registry:AStreamRegistry;
+    public var itemMapper:Mapper;
+    public var clazz:Class;
 
     public function ImplicitMapHandler(property:Property, nodeName:String, itemType:ClassInfo,
                                        keyProperty:Property, registry:AStreamRegistry)
     {
         super(nodeName, NodeType.ELEMENT);
-        this.property = property;
+        this.propertyName = property.name;
         this.itemType = itemType;
-        this.keyProperty = keyProperty;
+        this.keyPropertyName = keyProperty.name;
         this.registry = registry;
+        this.itemMapper = registry.getMapper(itemType);
+        this.clazz = property.type.getClass();
     }
 
     override public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
-        const value:Object = property.getValue(parentInstance);
-        const itemMapper:Mapper = registry.getMapper(itemType);
+        const value:Object = parentInstance[propertyName];
         TypeUtil.forEachInMap(value,
                 function (value:Object, key:Object, map:Object):void {
                     if (value == null) {
@@ -55,23 +58,22 @@ public class ImplicitMapHandler extends BaseHandler {
 
     override public function fromXML(parentXML:XML, parentInstance:Object, deref:AStreamRef):void {
         var result:Object;
-        const itemMapper:Mapper = registry.getMapper(itemType);
         const keys:Array = new Array();
         const values:Array = new Array();
 
         for each (var itemXML:XML in parentXML.elements(nodeName)) {
             var value:Object = itemMapper.fromXML(itemXML, deref);
-            var key:Object = keyProperty.getValue(value);
+            var key:Object = value[keyPropertyName];
             keys.push(key);
             values.push(value);
         }
 
         if (keys.length > 0) {
-            result = property.type.newInstance([]);
+            result = new clazz();
             TypeUtil.putToMap(result, keys, values);
         }
 
-        property.setValue(parentInstance, result);
+        parentInstance[propertyName] = result;
     }
 }
 }
