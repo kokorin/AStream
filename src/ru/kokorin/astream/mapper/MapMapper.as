@@ -33,6 +33,11 @@ public class MapMapper extends BaseMapper {
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillXML(instance, xml, ref);
 
+        var prevKeyType:ClassInfo = null;
+        var prevKeyMapper:Mapper = registry.getMapper(prevKeyType);
+        var prevValueType:ClassInfo = prevKeyType;
+        var prevValueMapper:Mapper = prevKeyMapper;
+
         TypeUtil.forEachInMap(instance,
                 function (value:Object, key:Object, map:Object):void {
                     const entryXML:XML = <entry/>;
@@ -41,14 +46,28 @@ public class MapMapper extends BaseMapper {
                     if (key != null) {
                         keyType = ClassInfo.forInstance(key);
                     }
-                    const keyMapper:Mapper = registry.getMapper(keyType);
+                    var keyMapper:Mapper;
+                    if (keyType == prevKeyType) {
+                        keyMapper = prevKeyMapper;
+                    } else {
+                        keyMapper = registry.getMapper(keyType);
+                        prevKeyType = keyType;
+                        prevKeyMapper = keyMapper;
+                    }
                     entryXML.appendChild(keyMapper.toXML(key, ref));
 
                     var valueType:ClassInfo;
                     if (value != null) {
                         valueType = ClassInfo.forInstance(value);
                     }
-                    const valueMapper:Mapper = registry.getMapper(valueType);
+                    var valueMapper:Mapper;
+                    if (valueType == prevValueType) {
+                        valueMapper = prevValueMapper;
+                    } else {
+                        valueMapper = registry.getMapper(valueType);
+                        prevValueType = valueType;
+                        prevValueMapper = valueMapper;
+                    }
                     entryXML.appendChild(valueMapper.toXML(value, ref));
 
                     xml.appendChild(entryXML);

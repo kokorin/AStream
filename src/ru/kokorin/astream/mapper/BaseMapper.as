@@ -27,14 +27,15 @@ import ru.kokorin.astream.ref.AStreamRef;
 public class BaseMapper implements Mapper {
     private var _classInfo:ClassInfo;
     private var _registry:AStreamRegistry;
-    private var nodeName:String;
     private var clazz:Class;
+    private var nodeName:String = null;
 
     /**
      * @param classInfo Description of Class which this mapper will handle
      */
     public function BaseMapper(classInfo:ClassInfo) {
         this._classInfo = classInfo;
+        this.clazz = classInfo.getClass();
     }
 
     /**
@@ -44,6 +45,9 @@ public class BaseMapper implements Mapper {
      */
     public final function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML {
         if (nodeName == null) {
+            if (this.nodeName == null) {
+                this.nodeName = registry.getAlias(classInfo);
+            }
             nodeName = this.nodeName;
         }
         const result:XML = <{nodeName}/>;
@@ -74,7 +78,7 @@ public class BaseMapper implements Mapper {
             const attRef:XML = xml.attribute("reference")[0];
             if (attRef != null) {
                 result = ref.getValue(String(attRef));
-            } else if (classInfo != null) {
+            } else if (clazz != null) {
                 result = new clazz();
                 fillObject(result, xml, ref);
             }
@@ -124,12 +128,10 @@ public class BaseMapper implements Mapper {
 
     public function set registry(value:AStreamRegistry):void {
         _registry = value;
-        reset();
     }
 
     public function reset():void {
-        nodeName = registry.getAlias(classInfo);
-        clazz = classInfo.getClass();
+        nodeName = null;
     }
 }
 }

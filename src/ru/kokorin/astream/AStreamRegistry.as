@@ -38,13 +38,11 @@ import ru.kokorin.astream.mapper.CollectionMapper;
 import ru.kokorin.astream.mapper.ComplexMapper;
 import ru.kokorin.astream.mapper.ExternalizableMapper;
 import ru.kokorin.astream.mapper.MapMapper;
+import ru.kokorin.astream.mapper.NullMapper;
 import ru.kokorin.astream.mapper.SimpleMapper;
 import ru.kokorin.astream.util.TypeUtil;
 
 public class AStreamRegistry {
-    private var _autodetectMetadata:Boolean = false;
-    private var metadataProcessor:AStreamMetadataProcessor;
-
     private const packageByAliasMap:Map = new Map();
     private const aliasByPackageMap:Map = new Map();
     private const classDataMap:Map = new Map();
@@ -63,40 +61,29 @@ public class AStreamRegistry {
         alias("byte-array", ClassInfo.forClass(ByteArray));
         alias("list", ClassInfo.forClass(List));
         alias("map", ClassInfo.forClass(Map));
-        metadataProcessor = new AStreamMetadataProcessor(this);
-    }
-
-    public function autodetectMetadata(value:Boolean):void {
-        _autodetectMetadata = value;
-    }
-
-    public function processMetadata(classInfo:ClassInfo):void {
-        metadataProcessor.processMetadata(classInfo);
-        autodetectMetadata(false);
     }
 
     public function registerConverter(converter:Converter, classInfo:ClassInfo):void {
         const classData:ClassData = getClassData(classInfo);
         classData.converter = converter;
-        const mapper:Mapper = new SimpleMapper(classInfo);
-        registerMapper(mapper, classInfo);
+        const mapper:Mapper = new SimpleMapper(classInfo, converter);
+        mapper.registry = this;
+        classData.mapper = mapper;
     }
 
     public function registerConverterForProperty(converter:Converter, classInfo:ClassInfo, propertyName:String):void {
         const classData:ClassData = getClassData(classInfo);
         const propertyData:PropertyData = classData.getPropertyData(propertyName);
         propertyData.converter = converter;
-        const mapper:Mapper = new SimpleMapper(classInfo, propertyName);
-        registerMapperForProperty(mapper, classInfo, propertyName);
+
+        //TODO property simple mapper does'n use classInfo
+        const mapper:Mapper = new SimpleMapper(classInfo, converter);
+        mapper.registry = this;
+        propertyData.mapper = mapper;
     }
 
     public function getConverter(classInfo:ClassInfo):Converter {
-        const classData:ClassData = getClassData(classInfo);
-
-        if (classData.converter == null) {
-            classData.converter = createConverter(classInfo);
-        }
-        return classData.converter;
+        return getClassData(classInfo).converter;
     }
 
     public function getConverterForProperty(classInfo:ClassInfo, propertyName:String):Converter {
@@ -128,29 +115,11 @@ public class AStreamRegistry {
 
     public function getMapper(nameOrClassInfo:Object):Mapper {
         const classInfo:ClassInfo = getClassInfo(nameOrClassInfo);
-        const classData:ClassData = getClassData(classInfo);
-
-        if (classData.mapper == null) {
-            if (_autodetectMetadata) {
-                metadataProcessor.processMetadata(classInfo);
-            }
-            classData.mapper = createMapper(classInfo);
-        }
-        return classData.mapper;
+        return getClassData(classInfo).mapper;
     }
 
     public function getMapperForProperty(classInfo:ClassInfo, propertyName:String):Mapper {
-        const classData:ClassData = getClassData(classInfo);
-        const propertyData:PropertyData = classData.getPropertyData(propertyName);
-        if (propertyData.mapper) {
-            return propertyData.mapper;
-        }
-
-        const property:Property = classInfo.getProperty(propertyName);
-        if (property != null) {
-            return getMapper(property.type);
-        }
-        return null;
+        return getClassData(classInfo).getPropertyData(propertyName).mapper;
     }
 
     public function aliasPackage(name:String, pckg:String):void {
@@ -297,51 +266,71 @@ public class AStreamRegistry {
         }
     }
 
-    private function createConverter(classInfo:ClassInfo):Converter {
+
+    private function getClassData(classInfo:ClassInfo):ClassData {
+        var result:ClassData = classDataMap.get(classInfo);
+        if (result == null) {
+            result = new ClassData();
+
+            const converter:Converter = createConverter(classInfo);
+            var mapper:Mapper = null;
+            if (converter) {
+                mapper = new SimpleMapper(classInfo, converter);
+            } else {
+                mapper = createMapper(classInfo);
+            }
+            if (mapper) {
+                mapper.registry = this;
+            }
+
+            result.converter = converter;
+            result.mapper = mapper;
+            classDataMap.put(classInfo, result);
+        }
+        return result;
+    }
+
+    private static function createConverter(classInfo:ClassInfo):Converter {
         if (classInfo != null) {
+            if (classInfo.isType(Number)) {
+                return new NumberConverter();
+            }
+            if (classInfo.isType(String)) {
+                return new StringConverter();
+            }
             if (classInfo.isType(Boolean)) {
                 return new BooleanConverter();
-            } else if (classInfo.isType(Date)) {
+            }
+            if (classInfo.isType(Date)) {
                 return new DateConverter();
-            } else if (classInfo.isType(Number)) {
-                return new NumberConverter();
-            } else if (classInfo.isType(String)) {
-                return new StringConverter();
-            } else if (classInfo.isType(ByteArray)) {
+            }
+            if (classInfo.isType(ByteArray)) {
                 return new ByteArrayConverter();
-            } else if (classInfo.isType(Enum)) {
+            }
+            if (classInfo.isType(Enum)) {
+                return new EnumConverter(classInfo);
+            }
+            if (classInfo.isType(Enum)) {
                 return new EnumConverter(classInfo);
             }
         }
         return null;
     }
 
-    private function createMapper(classInfo:ClassInfo):Mapper {
-        var result:Mapper;
-
-        if (classInfo == null || getConverter(classInfo) != null) {
-            result = new SimpleMapper(classInfo);
-        } else if (TypeUtil.isCollection(classInfo)) {
-            result = new CollectionMapper(classInfo);
-        } else if (TypeUtil.isMap(classInfo)) {
-            result = new MapMapper(classInfo);
-        } else if (classInfo.isType(IExternalizable)) {
-            result = new ExternalizableMapper(classInfo);
-        } else {
-            result = new ComplexMapper(classInfo);
+    private static function createMapper(classInfo:ClassInfo):Mapper {
+        if (classInfo == null) {
+            return new NullMapper();
         }
-        result.registry = this;
-
-        return result;
-    }
-
-    private function getClassData(classInfo:ClassInfo):ClassData {
-        var result:ClassData = classDataMap.get(classInfo);
-        if (result == null) {
-            result = new ClassData();
-            classDataMap.put(classInfo, result);
+        if (TypeUtil.isCollection(classInfo)) {
+            return  new CollectionMapper(classInfo);
         }
-        return result;
+        if (TypeUtil.isMap(classInfo)) {
+            return  new MapMapper(classInfo);
+        }
+        if (classInfo.isType(IExternalizable)) {
+            return  new ExternalizableMapper(classInfo);
+        }
+        return  new ComplexMapper(classInfo);
     }
 
     private static function replaceByLongestMatch(pckg:String, replaceMap:Map):String {

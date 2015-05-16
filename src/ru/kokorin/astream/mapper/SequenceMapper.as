@@ -47,16 +47,28 @@ public class SequenceMapper extends BaseMapper {
     override protected function fillXML(instance:Object, xml:XML, ref:AStreamRef):void {
         super.fillXML(instance, xml, ref);
         const sequence:Object = getSequence(instance);
+
+        var prevType:ClassInfo = null;
+        var prevMapper:Mapper = registry.getMapper(prevType);
         //Use forEachInCollection() loop wrapper because ArrayList doesn't support for each() loop
         TypeUtil.forEachInCollection(sequence,
-                function (itemValue:Object, i:int, collection:Object):void {
-                    var itemType:ClassInfo;
-                    if (itemValue != null) {
-                        itemType = ClassInfo.forInstance(itemValue);
+                function (item:Object, i:int, collection:Object):void {
+                    var type:ClassInfo = null;
+                    if (item != null) {
+                        type = ClassInfo.forInstance(item);
                     }
-                    const itemValueMapper:Mapper = registry.getMapper(itemType);
-                    const itemResult:XML = itemValueMapper.toXML(itemValue, ref);
-                    xml.appendChild(itemResult);
+
+                    var mapper:Mapper;
+                    if (type == prevType) {
+                        mapper = prevMapper;
+                    } else {
+                        mapper = registry.getMapper(type);
+                        prevType = type;
+                        prevMapper = mapper;
+                    }
+
+                    const result:XML = mapper.toXML(item, ref);
+                    xml.appendChild(result);
                 }
         );
     }

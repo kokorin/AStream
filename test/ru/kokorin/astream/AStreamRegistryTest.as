@@ -40,16 +40,41 @@ public class AStreamRegistryTest {
         assertEquals("getClass("+alias+")", classInfo, registry.getClassByName(alias));
     }
 
-    public static var ALIAS_DATA:Array = [
+    public static var DEFAULT_ALIAS_DATA:Array = [
         [Vector.<Object>, "Object-array"],
         [Vector.<TestVO>, "ru.kokorin.astream.valueobject.TestVO-array"],
-        [Vector.<int>, "int-array"]
+        [Vector.<int>, "int-array"],
+        [Number, "float"],
+        [null, "null"]
     ];
-    [Test(dataProvider="ALIAS_DATA")]
-    public function testVectorAlias(type:Class, alias:String):void {
-        const info:ClassInfo = ClassInfo.forClass(type);
+    [Test(dataProvider="DEFAULT_ALIAS_DATA")]
+    public function testDefaultAlias(type:Class, alias:String):void {
+        var info:ClassInfo = null;
+        if (type != null) {
+            info = ClassInfo.forClass(type);
+        }
         assertEquals("Alias by class", registry.getAlias(info), alias);
         assertEquals("Class by alias", registry.getClassByName(alias), info);
+    }
+
+    public static var ALIAS_DATA:Array = [
+        [Vector.<Object>],
+        [Vector.<TestVO>],
+        [Vector.<int>],
+        [Object],
+        [TestVO],
+        [int],
+        [Number],
+        [null]
+    ];
+    [Test(dataProvider="ALIAS_DATA")]
+    public function testAlias(type:Class):void {
+        var info:ClassInfo = null;
+        if (type != null) {
+            info = ClassInfo.forClass(type);
+        }
+        registry.alias("myAlias", info);
+        assertEquals("Wrong alias!", "myAlias", registry.getAlias(info));
     }
 }
 }

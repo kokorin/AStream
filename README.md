@@ -1,14 +1,14 @@
 AStream
 =======
 
-AStream can handle enums. Enum's name passed to super() and static property name must coincide.
+AStream can handle enums. Enum's name passed to super() is used to represent enum's value in XML.
 ```as3
 package com.example.domain {
 import as3.lang.Enum;
 
 public class UserRole extends Enum {
-    public static const ADMINISTRATOR:UserRole = new UserRole("ADMINISTRATOR");
-    public static const OPERATOR:UserRole = new UserRole("OPERATOR");
+    public static const ADMINISTRATOR:UserRole = new UserRole("ROLE_ADMINISTRATOR");
+    public static const OPERATOR:UserRole = new UserRole("ROLE_OPERATOR");
 
     public function UserRole(name:String) {
         super(name);
@@ -74,13 +74,13 @@ const xml:XML = aStream.toXML(user);
  <User>
     <id>1</id>
     <name>Ivanov Ivan</name>
-    <role>ADMINISTRATOR</role>
+    <role>ROLE_ADMINISTRATOR</role>
     <birth>1960-05-19</birth>
  </User> */
 
 const restoredUser:User = aStream.fromXML(xml) as User;
 /* restoredUser.toString()
-User{name=Ivanov Ivan,id=1,role=ADMINISTRATOR,birth=Thu May 19 00:00:00 GMT+0300 1960} */
+User{name=Ivanov Ivan,id=1,role=ROLE_ADMINISTRATOR,birth=Thu May 19 00:00:00 GMT+0300 1960} */
 ```        
 
 **Сorresponding types (by default)**
@@ -94,6 +94,6 @@ User{name=Ivanov Ivan,id=1,role=ADMINISTRATOR,birth=Thu May 19 00:00:00 GMT+0300
     Float, float     |        float        |               Number                  
     Integer, int     |         int         |                int                  
    java.util.Date    |         date        |                Date
-      String         |        string       |               String                 
+  java.lang.String   |        string       |               String                 
       
       

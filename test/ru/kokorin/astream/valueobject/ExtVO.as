@@ -19,6 +19,7 @@ public class ExtVO extends TestVO implements IExternalizable {
         output.writeObject(value4);
         output.writeBoolean(checked);
         output.writeObject(children);
+        output.writeObject(testVO);
     }
 
     public function readExternal(input:IDataInput):void {
@@ -32,6 +33,7 @@ public class ExtVO extends TestVO implements IExternalizable {
         value4 = input.readObject();
         checked = input.readBoolean();
         children = input.readObject() as Array;
+        testVO = input.readObject() as TestVO;
     }
 }
 }

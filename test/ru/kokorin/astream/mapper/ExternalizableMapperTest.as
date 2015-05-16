@@ -8,6 +8,7 @@ import ru.kokorin.astream.ref.AStreamRef;
 import ru.kokorin.astream.ref.NoRef;
 import ru.kokorin.astream.valueobject.EnumVO;
 import ru.kokorin.astream.valueobject.ExtVO;
+import ru.kokorin.astream.valueobject.TestVO;
 
 public class ExternalizableMapperTest {
     private const registry:AStreamRegistry = new AStreamRegistry();
@@ -21,6 +22,7 @@ public class ExternalizableMapperTest {
         original.value2 = int.MAX_VALUE;
         original.value3 = 0xABCDEF;
         original.value4 = null;
+        original.testVO = new TestVO("Child");
 
         const complexMapper:ExternalizableMapper = new ExternalizableMapper(ClassInfo.forClass(ExtVO));
         complexMapper.registry = registry;

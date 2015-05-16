@@ -15,6 +15,7 @@ public class TestVO {
     public var children:Array;
     public var point:Point;
     public var point2:Point;
+    public var testVO:TestVO;
 
     public function TestVO(name:String = null) {
         this.name = name;
@@ -52,6 +53,9 @@ public class TestVO {
         }
         if (point2 != null) {
             result.push("point2="+point2);
+        }
+        if (testVO != null) {
+            result.push("testVO="+testVO);
         }
 
         const clazzName:String = getQualifiedClassName(this).split(".").reverse()[0];

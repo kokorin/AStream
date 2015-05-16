@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Kokorin Denis
+ * Copyright 2015 Kokorin Denis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,30 @@
  */
 
 package ru.kokorin.astream.mapper {
-import org.spicefactory.lib.reflect.ClassInfo;
-
 import ru.kokorin.astream.AStreamRegistry;
-import ru.kokorin.astream.converter.Converter;
 import ru.kokorin.astream.ref.AStreamRef;
 
-/**
- * Maps object to a nested element node.
- * Uses converter to get a string representation of object.
- * @see ru.kokorin.astream.converter.Converter
- */
-public class SimpleMapper implements Mapper {
-    private var classInfo:ClassInfo;
-    private var converter:Converter;
+public class NullMapper implements Mapper {
     private var _registry:AStreamRegistry;
     private var nodeName:String = null;
 
-    public function SimpleMapper(classInfo:ClassInfo, converter:Converter) {
-        this.classInfo = classInfo;
-        this.converter = converter;
+    public function NullMapper() {
     }
 
     /** @inheritDoc */
     public function fromXML(xml:XML, ref:AStreamRef):Object {
-        var result:Object = null;
-        result = converter.fromString(String(xml.text()));
-        return result;
+        return null;
     }
 
     /** @inheritDoc */
     public function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML {
         if (nodeName == null) {
             if (this.nodeName == null) {
-                this.nodeName = registry.getAlias(classInfo);
+                this.nodeName = registry.getAlias(null);
             }
             nodeName = this.nodeName;
         }
-        const result:XML = <{nodeName}/>;
-        result.appendChild(converter.toString(instance));
-        return result;
+        return <{nodeName}/>;
     }
 
     /** @inheritDoc */

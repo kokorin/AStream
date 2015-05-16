@@ -1,9 +1,6 @@
 package ru.kokorin.astream {
 import flash.utils.Dictionary;
 
-import mx.collections.ArrayCollection;
-import mx.collections.ArrayList;
-
 import org.flexunit.assertThat;
 import org.flexunit.asserts.assertEquals;
 import org.flexunit.asserts.assertNotNull;
@@ -12,10 +9,8 @@ import org.flexunit.asserts.assertTrue;
 import org.hamcrest.collection.arrayWithSize;
 import org.spicefactory.lib.reflect.ClassInfo;
 
-import ru.kokorin.astream.metadata.AStreamMapper;
-
 import ru.kokorin.astream.valueobject.EnumVO;
-
+import ru.kokorin.astream.valueobject.ExtVO;
 import ru.kokorin.astream.valueobject.TestVO;
 
 [RunWith("org.flexunit.runners.Parameterized")]
@@ -31,6 +26,13 @@ public class AStreamTest {
     public function testNull():void {
         assertEquals("aStream.toXML(null)", "<null/>", aStream.toXML(null).toXMLString());
         assertNull("aStream.fromXML(<null/>)", aStream.fromXML(XML("<null/>")));
+    }
+
+    [Test]
+    public function testNullAlias():void {
+        aStream.alias("NullAlias", null);
+        assertEquals("aStream.toXML(null)", "<NullAlias/>", aStream.toXML(null).toXMLString());
+        assertNull("aStream.fromXML(<null/>)", aStream.fromXML(XML("<NullAlias/>")));
     }
 
     [Test]
@@ -151,5 +153,63 @@ public class AStreamTest {
         assertEquals("Restored.value4 like Restored.children", String(restored.value4), String(restored.children));
         assertThat("Restored children length", restored.children, arrayWithSize(original.children.length));
     }
+
+    [Test]
+    public function testExplicitConverter():void {
+        aStream.registerConverterForProperty(new ExplicitConverter(), TestVO, "testVO");
+        const original:TestVO = new TestVO("Root");
+        original.testVO = new ExtVO();
+        const xml:XML = aStream.toXML(original);
+
+        assertEquals("Explicit property converter should be used even for subtypes",
+                "ExplicitConverter", String(xml.testVO));
+    }
+
+    [Test]
+    public function testExplicitMapper():void {
+        aStream.registerMapperForProperty(new ExplicitMapper(), TestVO, "testVO");
+        const original:TestVO = new TestVO("Root");
+        original.testVO = new ExtVO();
+        const xml:XML = aStream.toXML(original);
+
+        assertEquals("Explicit property mapper should be used even for subtypes",
+                "ExplicitMapper", String(xml.testVO));
+    }
 }
+}
+
+import ru.kokorin.astream.AStreamRegistry;
+import ru.kokorin.astream.converter.Converter;
+import ru.kokorin.astream.mapper.Mapper;
+import ru.kokorin.astream.ref.AStreamRef;
+
+class ExplicitConverter implements Converter {
+
+    public function fromString(string:String):Object {
+        return null;
+    }
+    public function toString(value:Object):String {
+        return "ExplicitConverter";
+    }
+}
+
+class ExplicitMapper implements Mapper {
+
+    public function toXML(instance:Object, ref:AStreamRef, nodeName:String = null):XML {
+        return <{nodeName}>ExplicitMapper</{nodeName}>;
+    }
+
+    public function fromXML(xml:XML, ref:AStreamRef):Object {
+        return null;
+    }
+
+    public function get registry():AStreamRegistry {
+        return null;
+    }
+
+    public function set registry(value:AStreamRegistry):void {
+    }
+
+    public function reset():void {
+    }
 }

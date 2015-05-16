@@ -28,7 +28,10 @@ import ru.kokorin.astream.ref.XPathRef;
 public class AStream {
     private var ref:AStreamRef;
     private var needReset:Boolean = false;
+    private var _autodetectMetadata:Boolean = false;
     private const registry:AStreamRegistry = new AStreamRegistry();
+    private const metadataProcessor:AStreamMetadataProcessor = new AStreamMetadataProcessor(registry);
+
 
     public function AStream() {
         mode = AStreamMode.XPATH_RELATIVE_REFERENCES;
@@ -121,8 +124,9 @@ public class AStream {
         }
         for each (var clazz:Class in classOrArray) {
             var classInfo:ClassInfo = ClassInfo.forClass(clazz);
-            registry.processMetadata(classInfo);
+            metadataProcessor.processMetadata(classInfo);
         }
+        autodetectMetadata(false);
         needReset = true;
     }
 
@@ -166,9 +170,15 @@ public class AStream {
 
     /**
      * Set up class' alias
+     * @param name alias
+     * @param clazz Class. Pass null to set alias for <b>null</b>
      */
     public function alias(name:String, clazz:Class):void {
-        registry.alias(name, ClassInfo.forClass(clazz));
+        var clazzInfo:ClassInfo = null;
+        if (clazz != null) {
+            clazzInfo = ClassInfo.forClass(clazz);
+        }
+        registry.alias(name, clazzInfo);
         needReset = true;
     }
 
@@ -212,7 +222,7 @@ public class AStream {
     }
 
     public function autodetectMetadata(value:Boolean):void {
-        registry.autodetectMetadata(value);
+        _autodetectMetadata = value;
     }
 
     public function toXML(object:Object):XML {

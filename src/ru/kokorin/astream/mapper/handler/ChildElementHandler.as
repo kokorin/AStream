@@ -27,28 +27,33 @@ public class ChildElementHandler extends BaseHandler {
     private var propertyName:String;
     private var propertyType:ClassInfo;
     private var registry:AStreamRegistry;
-    private var defaultMapper:Mapper;
+    private var propertyMapper:Mapper;
+    private var explicitMapper:Boolean = true;
 
     public function ChildElementHandler(property:Property, nodeName:String, registry:AStreamRegistry) {
         super(nodeName, NodeType.ELEMENT);
         this.propertyName = property.name;
         this.propertyType = property.type;
         this.registry = registry;
-        this.defaultMapper = registry.getMapperForProperty(property.owner, property.name);
+        propertyMapper = registry.getMapperForProperty(property.owner, property.name);
+        if (propertyMapper == null) {
+            explicitMapper = false;
+            propertyMapper = registry.getMapper(property.type);
+        }
     }
 
     override public function toXML(parentInstance:Object, parentXML:XML, ref:AStreamRef):void {
         const value:Object = parentInstance[propertyName];
         if (value != null) {
             const valueType:ClassInfo = ClassInfo.forInstance(value);
-            var valueMapper:Mapper;
+            var valueMapper:Mapper = propertyMapper;
             var className:String = null;
-            /* int is subtype of Number! We do not need "class" attribute in XML in case of any numbers*/
-            if (!valueType.isType(Number) && valueType != propertyType) {
+            /* int is subtype of Number! We do not need "class" attribute in XML in case of any numbers.
+            *  If mapper is set explicitly (AStream.registerMapperForProperty or [AStreamMapper] metadata),
+            *   we should use that mapper even for subtypes */
+            if (!explicitMapper && valueType != propertyType && !valueType.isType(Number)) {
                 valueMapper = registry.getMapper(valueType);
                 className = registry.getAlias(valueType);
-            } else {
-                valueMapper = defaultMapper;
             }
 
             const result:XML = valueMapper.toXML(value, ref, nodeName);
@@ -64,11 +69,9 @@ public class ChildElementHandler extends BaseHandler {
         var value:Object;
         if (elementValue != null) {
             const attAlias:XML = elementValue.attribute("class")[0];
-            var valueMapper:Mapper;
+            var valueMapper:Mapper = propertyMapper;
             if (attAlias != null) {
                 valueMapper = registry.getMapper(String(attAlias));
-            } else {
-                valueMapper = defaultMapper;
             }
             value = valueMapper.fromXML(elementValue, deref);
         }

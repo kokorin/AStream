@@ -105,20 +105,19 @@ public class ComplexMapperTest {
     [Test]
     public function testReset():void {
         original.children = [new TestVO("First"), new TestVO("Second"), new TestVO("Third")];
-        const xmlBeforeAlias:XML = complexMapper.toXML(original, noRef);
-        noRef.clear();
+        const xmlBefore:XML = complexMapper.toXML(original, noRef);
 
         registry.alias("test", TEST_VO);
         registry.implicit(TEST_VO, "children", "child", TEST_VO, null);
-        const xmlAfterAlias:XML = complexMapper.toXML(original, noRef);
         noRef.clear();
-
         complexMapper.reset();
-        const xmlAfterReset:XML = complexMapper.toXML(original, noRef);
 
-        assertEquals("Before alias and after", xmlBeforeAlias.toXMLString(), xmlAfterAlias.toXMLString());
-        assertTrue("After alias still NO 'child' property", xmlAfterAlias.elements("child")[0] === undefined);
-        assertTrue("After reset we do have 'child' property", xmlAfterReset.elements("child")[0] !== undefined);
+        const xmlAfter:XML = complexMapper.toXML(original, noRef);
+
+        assertEquals("Before alias name", "ru.kokorin.astream.valueobject.TestVO", String(xmlBefore.name()));
+        assertEquals("After alias name", "test", String(xmlAfter.name()));
+        assertTrue("Before reset we have NO 'child' property", xmlBefore.elements("child")[0] === undefined);
+        assertTrue("After reset we do have 'child' property", xmlAfter.elements("child")[0] !== undefined);
     }
 
     [Test]

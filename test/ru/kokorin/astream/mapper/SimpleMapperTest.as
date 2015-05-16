@@ -117,7 +117,7 @@ public class SimpleMapperTest {
     }
 
     private function createSimpleMapper(classInfo:ClassInfo):SimpleMapper {
-        const result:SimpleMapper = new SimpleMapper(classInfo);
+        const result:SimpleMapper = new SimpleMapper(classInfo, registry.getConverter(classInfo));
         result.registry = registry;
         return result;
     }
